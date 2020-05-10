@@ -1,8 +1,44 @@
 import hashlib
 
-from sqlalchemy import Column, String, Integer, Date, Float, Boolean, DateTime
+from sqlalchemy import Column, String, Integer, Date, Float, Boolean, DateTime, ForeignKey, ARRAY, BigInteger
+from sqlalchemy.orm import relationship
+
 from base import Base, engine
 from datetime import datetime
+
+
+def sha_gen(movie_title, watchdate):
+    wanted_sha = f"{movie_title}{watchdate}"
+    return hashlib.sha1(wanted_sha.encode()).hexdigest()
+
+
+class ExtensionIMDB(Base):
+    __tablename__ = 'imdb_helper_db'
+
+    id = Column(Integer, primary_key=True)
+    imdb_id = Column(String, unique=True)
+    main_db = relationship("MovieDatabase", back_populates="imdb_db")
+    cast = Column(ARRAY(String))
+    genres = Column(ARRAY(String))
+    director = Column(ARRAY(String))
+    rating = Column(Float)
+    votes = Column(BigInteger)
+    title = Column(String)
+    year = Column(Integer)
+    runtimes = Column(ARRAY(Integer))
+    composers = Column(String)
+
+    def __init__(self, **kwargs):
+        self.imdb_id = kwargs.get("imdb_id")
+        self.cast = kwargs.get("cast")
+        self.genres = kwargs.get("genres")
+        self.director = kwargs.get("directors")
+        self.rating = kwargs.get("rating")
+        self.votes = kwargs.get("votes")
+        self.title = kwargs.get("title")
+        self.year = kwargs.get("year")
+        self.runtimes = kwargs.get("runtimes")
+        self.composers = kwargs.get("composers")
 
 
 class MovieDatabase(Base):
@@ -17,6 +53,8 @@ class MovieDatabase(Base):
     rewatch = Column(Boolean)
     published = Column(DateTime)
     sha = Column(String, unique=True)
+    imdb_id = Column(String, ForeignKey('imdb_helper_db.imdb_id'))
+    imdb_db = relationship("ExtensionIMDB", back_populates="main_db")
 
     def __init__(self, **kwargs):
         self.letter_boxd_id = kwargs.get("id")
@@ -27,12 +65,10 @@ class MovieDatabase(Base):
         self.letterboxd_link = kwargs.get("link")
         self.rewatch = self.convert_boolean(kwargs.get("letterboxd_rewatch"))
         self.published = self.convert_datetime(kwargs.get("published"))
-        self.sha = self.sha_gen(kwargs.get("letterboxd_filmtitle"),
-                                kwargs.get("letterboxd_watcheddate"))
-
-    def sha_gen(self, movie_title, watchdate):
-        wanted_sha = f"{movie_title}{watchdate}"
-        return hashlib.sha1(wanted_sha.encode()).hexdigest()
+        self.sha = sha_gen(kwargs.get("letterboxd_filmtitle"),
+                           kwargs.get("letterboxd_watcheddate"))
+        self.imdb_id = kwargs.get("IMDB_ID")
+        self.imdb_db = kwargs.get("imdb_db_obj")
 
     def convert_date(self, date_str):
         return datetime.strptime(date_str, "%Y-%m-%d").date()
@@ -45,8 +81,3 @@ class MovieDatabase(Base):
             return True
         else:
             return False
-
-
-if __name__ == '__main__':
-    db = MovieDatabase()
-    db.create_table()
