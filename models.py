@@ -16,7 +16,7 @@ class ExtensionIMDB(Base):
     __tablename__ = 'imdb_helper_db'
 
     id = Column(Integer, primary_key=True)
-    imdb_id = Column(String, unique=True)
+    imdb_id = Column(String, unique=True, index=True)
     main_db = relationship("MovieDatabase", back_populates="imdb_db")
     cast = Column(ARRAY(String))
     genres = Column(ARRAY(String))
@@ -27,6 +27,7 @@ class ExtensionIMDB(Base):
     year = Column(Integer)
     runtimes = Column(ARRAY(Integer))
     composers = Column(String)
+    languages = Column(ARRAY(String))
 
     def __init__(self, **kwargs):
         self.imdb_id = kwargs.get("imdb_id")
@@ -39,6 +40,7 @@ class ExtensionIMDB(Base):
         self.year = kwargs.get("year")
         self.runtimes = kwargs.get("runtimes")
         self.composers = kwargs.get("composers")
+        self.languages = kwargs.get("languages")
 
 
 class MovieDatabase(Base):
@@ -52,7 +54,7 @@ class MovieDatabase(Base):
     letterboxd_link = Column(String)
     rewatch = Column(Boolean)
     published = Column(DateTime)
-    sha = Column(String, unique=True)
+    sha = Column(String, unique=True, index=True)
     imdb_id = Column(String, ForeignKey('imdb_helper_db.imdb_id'))
     imdb_db = relationship("ExtensionIMDB", back_populates="main_db")
 

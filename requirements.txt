@@ -1,3 +1,4 @@
+imdb
 feedparser==5.2.1
 IMDbPY==6.8
 lxml==4.5.0
