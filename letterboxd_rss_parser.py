@@ -116,6 +116,6 @@ class LetterBoxdRss:
 
 if __name__ == '__main__':
     obj = LetterBoxdRss()
-    # # obj.feed_db_pipeline()
+    obj.feed_db_pipeline()
     # obj.correct_imdb_entry("8ed3e47890fa145420922f69a3d508d90b1dab2c", "10459356", "6565702", delete_imdb_id=True)
     # #obj.correct_imdb_entry("5e7b10b98624ff14df350ad77728665b8c52725c", "11462134", "2527338", delete_imdb_id=True)
