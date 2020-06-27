@@ -19,7 +19,6 @@ class MovieListSorter:
         self.item_dicts = dict()
         self.sorted_dict = dict()
         self.movie_names = list()
-        pass
 
     def read_csv(self):
         with open(self.file_location) as csvfile:
@@ -44,6 +43,8 @@ class MovieListSorter:
             i = j = k = 0
 
             while i < len(left_side) and j < len(right_side):
+                print(f"\n\n")
+                print(f"Left Side: {left_side}, Right Side: {right_side}")
                 print(f"1.{left_side[i]}\n2.{right_side[j]}")
                 answer = input("which one is greater 1 or 2?")
                 if answer == "1":
@@ -86,15 +87,14 @@ class MovieListSorter:
 if __name__ == '__main__':
     mls = MovieListSorter("E:\\Movie Data\\letterboxd-naveenpiedy-jun\\lists\\all-time-favorites.csv")
     mls.read_csv()
-    # mls.movie_sorter(mls.movie_names)
-    # print(mls.movie_names)
+    mls.movie_sorter(mls.movie_names)
+    print(mls.movie_names)
 
-    sorted_list = ['Moonrise Kingdom', 'The Grand Budapest Hotel', 'The Royal Tenenbaums', 'Parasite', 'Pulp Fiction',
-                   'La La Land', 'Portrait of a Lady on Fire', 'Jojo Rabbit', 'Kill Bill: Vol. 1',
-                   'Inglourious Basterds', 'Kill Bill: Vol. 2', 'Lady Bird', 'The Dark Knight', 'Little Women',
-                   'Marriage Story', 'Avengers: Endgame', 'The Avengers', 'The Iron Giant',
-                   'Scott Pilgrim vs. the World', 'Knives Out', 'Back to the Future', 'About Time',
-                   'When Harry Met Sally...', "Ocean's Eleven", 'Alaipayuthey']
-    mls.movie_names = sorted_list
+    # sorted_list = ['Moonrise Kingdom', 'The Grand Budapest Hotel', 'The Royal Tenenbaums', 'Parasite', 'Pulp Fiction',
+    #                'La La Land', 'Portrait of a Lady on Fire', 'Jojo Rabbit', 'Kill Bill: Vol. 1',
+    #                'Inglourious Basterds', 'Kill Bill: Vol. 2', 'Lady Bird', 'The Dark Knight', 'Little Women',
+    #                'Marriage Story', 'Avengers: Endgame', 'The Avengers', 'The Iron Giant',
+    #                'Scott Pilgrim vs. the World', 'Knives Out', 'Back to the Future', 'About Time',
+    #                'When Harry Met Sally...', "Ocean's Eleven", 'Alaipayuthey']
     mls.movie_object_sorter()
     mls.write_csv()

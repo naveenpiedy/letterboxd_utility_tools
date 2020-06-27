@@ -1,3 +1,5 @@
+import logging
+
 import feedparser
 from base import Base, engine, Session
 from models import MovieDatabase, sha_gen, ExtensionIMDB
@@ -37,10 +39,14 @@ class LetterBoxdRss:
             title = item.get("letterboxd_filmtitle")
             year = item.get("letterboxd_filmyear")
             sha_generated = sha_gen(item.get(title), item.get(year))
-            if title and sha_generated not in existing_sha:
-                movie = (self.imdb_obj.search_movie(f"{title} ({year})")[0])
-                movie_id = movie.getID()
-                item["IMDB_ID"] = movie_id
+            try:
+                if title and sha_generated not in existing_sha:
+                    movie = (self.imdb_obj.search_movie(f"{title} ({year})")[0])
+                    movie_id = movie.getID()
+                    item["IMDB_ID"] = movie_id
+            except Exception as e:
+                logging.warning(f"Exception Caught for movie {title}. Exception: {e}")
+                continue
 
     def get_all_imdb_ids(self):
         query = self.session.query(ExtensionIMDB.imdb_id)
@@ -48,7 +54,7 @@ class LetterBoxdRss:
         all_imdb_ids = set([r for r, in imdb_ids])
         return all_imdb_ids
 
-    def get_imdb_details(self, movie_id):
+    def get_imdb_details(self, movie_id: str) -> dict:
         movie = self.imdb_obj.get_movie(movie_id)
         keys = ["genres", "rating", "votes", "title", "year", "runtimes", "languages"]
         person_keys = ["cast", "directors", "composers"]
@@ -98,7 +104,7 @@ class LetterBoxdRss:
         self.session.commit()
         self.session.close()
 
-    def correct_imdb_entry(self, sha, wrong_id, correct_id, delete_imdb_id=False):
+    def correct_imdb_entry(self, sha: str, wrong_id: str, correct_id: str, delete_imdb_id: bool = False) -> None:
         movie = self.session.query(MovieDatabase).filter(MovieDatabase.sha == sha).scalar()
 
         if movie.imdb_id == wrong_id:
@@ -117,5 +123,5 @@ class LetterBoxdRss:
 if __name__ == '__main__':
     obj = LetterBoxdRss()
     obj.feed_db_pipeline()
-    # obj.correct_imdb_entry("8ed3e47890fa145420922f69a3d508d90b1dab2c", "10459356", "6565702", delete_imdb_id=True)
+    # obj.correct_imdb_entry("6d88bd1318b2f37a19bcce884ac0e01c9a20b7d8", "0272440", "0386422", delete_imdb_id=True)
     # #obj.correct_imdb_entry("5e7b10b98624ff14df350ad77728665b8c52725c", "11462134", "2527338", delete_imdb_id=True)

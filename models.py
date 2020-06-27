@@ -72,13 +72,16 @@ class MovieDatabase(Base):
         self.imdb_id = kwargs.get("IMDB_ID")
         self.imdb_db = kwargs.get("imdb_db_obj")
 
-    def convert_date(self, date_str):
+    @staticmethod
+    def convert_date(date_str):
         return datetime.strptime(date_str, "%Y-%m-%d").date()
 
-    def convert_datetime(self, datetime_str):
+    @staticmethod
+    def convert_datetime(datetime_str):
         return datetime.strptime(datetime_str, "%a, %d %b %Y %H:%M:%S %z")
 
-    def convert_boolean(self, boolean_str):
+    @staticmethod
+    def convert_boolean(boolean_str):
         if boolean_str == "Yes":
             return True
         else:
