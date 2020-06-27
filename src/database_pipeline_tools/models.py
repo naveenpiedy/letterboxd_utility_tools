@@ -3,7 +3,7 @@ import hashlib
 from sqlalchemy import Column, String, Integer, Date, Float, Boolean, DateTime, ForeignKey, ARRAY, BigInteger
 from sqlalchemy.orm import relationship
 
-from src.base import Base
+from src.database_pipeline_tools.base import Base
 from datetime import datetime
 
 

@@ -1,8 +1,8 @@
 import logging
 
 import feedparser
-from src.base import Base, engine, Session
-from src.models import MovieDatabase, sha_gen, ExtensionIMDB
+from src.database_pipeline_tools.base import Base, engine, Session
+from src.database_pipeline_tools.models import MovieDatabase, sha_gen, ExtensionIMDB
 import imdb
 
 

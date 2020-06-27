@@ -1,9 +1,9 @@
 import itertools
 import statistics
 
-from src.models import MovieDatabase, ExtensionIMDB
+from src.database_pipeline_tools.models import MovieDatabase, ExtensionIMDB
 import pandas as pd
-from src.base import engine
+from src.database_pipeline_tools.base import engine
 import datetime
 from collections import Counter, OrderedDict
 
@@ -21,6 +21,8 @@ class AnalysisSuite:
         self.imdb_df = imdb_df
         self.selected_movie_df = self.movie_df
         self.selected_imdb_df = self.imdb_df
+        self.flag_imdb = 2
+        self.flag_movie = 1
 
     def __set_selected_df__(self, movie_dataframe, imdb_dataframe):
         self.selected_movie_df = movie_dataframe
@@ -30,6 +32,17 @@ class AnalysisSuite:
         list_imdb = movie_dataframe["imdb_id"].to_list()
         imdb_dataframe = self.imdb_df[self.imdb_df["imdb_id"].isin(list_imdb)]
         return imdb_dataframe
+
+    def __allowable_column_names__(self, column_name: str, flag: int):
+        movie_col = {"id", "letter_boxd_id", "movie_title", "year_released", "my_rating", "watchdate" "letterboxd_link",
+                     "rewatch", "published", "sha", "imdb_id"}
+
+        imdb_col = {"id", "imdb_id", "main_db", "cast", "genres", "director", "rating", "votes", "title", "year",
+                    "runtimes", "composers", "languages"}
+        if flag == self.flag_imdb and column_name not in imdb_col:
+            raise Exception(f"Mentioned column name is not usable. Please use one of {imdb_col}")
+        elif flag == self.flag_movie and column_name not in movie_col:
+            raise Exception(f"Mentioned column name is not usable. Please use one of {movie_col}")
 
     def get_ratings_range(self, lower_value: float, higher_value: float) -> (pd.DataFrame, pd.DataFrame):
         df = self.movie_df['my_rating'].between(lower_value, higher_value, inclusive=True)
@@ -53,12 +66,25 @@ class AnalysisSuite:
         flattened_list = itertools.chain(*list_runtimes)
         return pd.to_datetime(sum(flattened_list), unit="m").strftime('%H:%M')
 
-    def count_item(self, column: str, imdb_period: pd.DataFrame = None) -> Counter:
-        if imdb_period is None:
-            imdb_period = self.selected_imdb_df
-        list_values = imdb_period[column].to_list()
-        flattened_list = itertools.chain(*list_values)
-        return Counter(flattened_list)
+    def __count_item__(self, dataframe: pd.DataFrame, column: str, flag: int) -> Counter:
+        self.__allowable_column_names__(column, flag)
+        list_values = dataframe[column].to_list()
+        try:
+            flattened_list = itertools.chain(*list_values)
+            ret = Counter(flattened_list)
+        except TypeError:
+            ret = Counter(list_values)
+        return ret
+
+    def count_item_imdb(self, column: str, imdb_df: pd.DataFrame = None) -> Counter:
+        if imdb_df is None:
+            imdb_df = self.selected_imdb_df
+        return self.__count_item__(imdb_df, column, self.flag_imdb)
+
+    def count_item_movie(self, column: str, movie_df: pd.DataFrame = None) -> Counter:
+        if movie_df is None:
+            movie_df = self.selected_movie_df
+        return self.__count_item__(movie_df, column, self.flag_movie)
 
     def ratings_genre(self, imdb_period: pd.DataFrame = None, movie_period: pd.DataFrame = None) -> OrderedDict:
         if imdb_period is None:

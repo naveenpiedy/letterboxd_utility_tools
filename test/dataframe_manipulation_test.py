@@ -2,7 +2,7 @@ import datetime
 import unittest
 import pandas as pd
 import pandas.testing as pd_testing
-from src.dataframe_manipulation import AnalysisSuite
+from src.database_pipeline_tools.dataframe_manipulation import AnalysisSuite
 
 
 class DataframeManipulationTest(unittest.TestCase):
@@ -43,14 +43,29 @@ class DataframeManipulationTest(unittest.TestCase):
         self.assertDataframeEqual(selected_movie_df, pd.read_pickle("movie_daterange_dataframe.pickle"), msg)
         self.assertDataframeEqual(selected_imdb_df, pd.read_pickle("imdb_daterange_dataframe.pickle"), msg)
         self.assertEqual(imdb_id_idf, imdb_id_mdf)
-        self.assertEqual({True}, set((start_date <= i <= end_date for i in watched_date_mdf)))
+        self.assertEqual({True}, {start_date <= i <= end_date for i in watched_date_mdf})
 
     def test_calculate_runtime(self):
         start_date = datetime.datetime(2020, 6, 1)
         end_date = datetime.datetime(2020, 6, 30)
         _, _ = self.analysis_suite.select_date_range(start_date, end_date)
+        
         self.assertEqual(self.analysis_suite.calculate_runtime(), "10:16")
         self.assertEqual(self.analysis_suite.calculate_runtime(imdb_period=self.imdb_df), "23:34")
+    
+    def test_count_item(self):
+        start_date = datetime.datetime(2020, 6, 1)
+        end_date = datetime.datetime(2020, 6, 30)
+        _, _ = self.analysis_suite.select_date_range(start_date, end_date)
+        
+        self.assertEqual(self.analysis_suite.count_item_imdb("year").most_common(1), [(2001, 3)])
+        self.assertEqual(self.analysis_suite.count_item_imdb("genres").most_common(1), [("Romance", 11)])
+        self.assertEqual(self.analysis_suite.count_item_imdb("year",
+                                                             imdb_df=self.imdb_df).most_common(1), [(2019, 11)])
+        self.assertEqual(self.analysis_suite.count_item_imdb("genres",
+                                                             imdb_df=self.imdb_df).most_common(1), [('Comedy', 45)])
+        self.assertRaises(Exception, self.analysis_suite.count_item_imdb, "genre")
+        self.assertEqual(self.analysis_suite.count_item_movie("my_rating").most_common(1), [(4.5, 4)])
 
 
 if __name__ == '__main__':
