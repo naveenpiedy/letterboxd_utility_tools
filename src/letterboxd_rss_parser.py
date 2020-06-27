@@ -1,8 +1,8 @@
 import logging
 
 import feedparser
-from base import Base, engine, Session
-from models import MovieDatabase, sha_gen, ExtensionIMDB
+from src.base import Base, engine, Session
+from src.models import MovieDatabase, sha_gen, ExtensionIMDB
 import imdb
 
 
@@ -90,7 +90,7 @@ class LetterBoxdRss:
             sha_generated = sha_gen(item.get("letterboxd_filmtitle"), item.get("letterboxd_watcheddate"))
             if sha_generated not in existing_sha and sha_generated not in sha_so_far:
                 imdb_id = item.get("IMDB_ID")
-                if imdb_id not in imdb_ids and imdb_id not in imdb_ids_so_far:
+                if imdb_id and imdb_id not in imdb_ids and imdb_id not in imdb_ids_so_far:
                     imdb_args = self.get_imdb_details(imdb_id)
                     imdb_db_obj = ExtensionIMDB(**imdb_args)
                     item["imdb_db_obj"] = imdb_db_obj
@@ -122,6 +122,6 @@ class LetterBoxdRss:
 
 if __name__ == '__main__':
     obj = LetterBoxdRss()
-    obj.feed_db_pipeline()
-    # obj.correct_imdb_entry("6d88bd1318b2f37a19bcce884ac0e01c9a20b7d8", "0272440", "0386422", delete_imdb_id=True)
+    # obj.feed_db_pipeline()
+    # obj.correct_imdb_entry("b256ac175e487d230a02b6ed074becf81a85fa74", None, "1606183", delete_imdb_id=True)
     # #obj.correct_imdb_entry("5e7b10b98624ff14df350ad77728665b8c52725c", "11462134", "2527338", delete_imdb_id=True)
