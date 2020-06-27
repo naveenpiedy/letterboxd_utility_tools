@@ -22,16 +22,35 @@ class DataframeManipulationTest(unittest.TestCase):
     def test_get_ratings_range(self):
         selected_movie_df, selected_imdb_df = self.analysis_suite.get_ratings_range(1.0, 2.0)
         msg = f"Assertion error raised in {self.test_get_ratings_range.__name__}"
+        ratings_list = set(selected_movie_df["my_rating"].tolist())
+        imdb_id_mdf = set(selected_movie_df["imdb_id"].tolist())
+        imdb_id_idf = set(selected_imdb_df["imdb_id"].tolist())
+
         self.assertDataframeEqual(selected_movie_df, pd.read_pickle("movie_range_dataframe.pickle"), msg)
         self.assertDataframeEqual(selected_imdb_df, pd.read_pickle("imdb_range_dataframe.pickle"), msg)
-
+        self.assertEqual({1.0, 1.5, 2.0}, ratings_list)
+        self.assertEqual(imdb_id_idf, imdb_id_mdf)
+        
     def test_select_date_range(self):
         start_date = datetime.datetime(2020, 6, 1)
         end_date = datetime.datetime(2020, 6, 30)
         selected_movie_df, selected_imdb_df = self.analysis_suite.select_date_range(start_date, end_date)
+        imdb_id_mdf = set(selected_movie_df["imdb_id"].tolist())
+        imdb_id_idf = set(selected_imdb_df["imdb_id"].tolist())
+        watched_date_mdf = set(selected_movie_df["watchdate"].tolist())
         msg = f"Assertion error raised in {self.test_select_date_range.__name__}"
+
         self.assertDataframeEqual(selected_movie_df, pd.read_pickle("movie_daterange_dataframe.pickle"), msg)
         self.assertDataframeEqual(selected_imdb_df, pd.read_pickle("imdb_daterange_dataframe.pickle"), msg)
+        self.assertEqual(imdb_id_idf, imdb_id_mdf)
+        self.assertEqual({True}, set((start_date <= i <= end_date for i in watched_date_mdf)))
+
+    def test_calculate_runtime(self):
+        start_date = datetime.datetime(2020, 6, 1)
+        end_date = datetime.datetime(2020, 6, 30)
+        _, _ = self.analysis_suite.select_date_range(start_date, end_date)
+        self.assertEqual(self.analysis_suite.calculate_runtime(), "10:16")
+        self.assertEqual(self.analysis_suite.calculate_runtime(imdb_period=self.imdb_df), "23:34")
 
 
 if __name__ == '__main__':

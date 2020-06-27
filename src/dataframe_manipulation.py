@@ -46,23 +46,24 @@ class AnalysisSuite:
         return movies_period, imdb_period
 
     def calculate_runtime(self, imdb_period: pd.DataFrame = None) -> str:
-        if not imdb_period:
+        if imdb_period is None:
             imdb_period = self.selected_imdb_df
         list_runtimes = imdb_period["runtimes"].to_list()
+        list_runtimes = filter(None, list_runtimes)
         flattened_list = itertools.chain(*list_runtimes)
         return pd.to_datetime(sum(flattened_list), unit="m").strftime('%H:%M')
 
     def count_item(self, column: str, imdb_period: pd.DataFrame = None) -> Counter:
-        if not imdb_period:
+        if imdb_period is None:
             imdb_period = self.selected_imdb_df
         list_values = imdb_period[column].to_list()
         flattened_list = itertools.chain(*list_values)
         return Counter(flattened_list)
 
     def ratings_genre(self, imdb_period: pd.DataFrame = None, movie_period: pd.DataFrame = None) -> OrderedDict:
-        if not imdb_period:
+        if imdb_period is None:
             imdb_period = self.selected_imdb_df
-        if not movie_period:
+        if movie_period is None:
             imdb_period = self.selected_movie_df
         list_runtimes = imdb_period["genres"].to_list()
         flattened_list = itertools.chain(*list_runtimes)
