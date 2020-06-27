@@ -75,7 +75,7 @@ class MovieListSorter:
             self.sorted_dict[val] = item
 
     def write_csv(self):
-        with open('sorted_list.csv', mode='w',  newline='') as sorted_list_csv:
+        with open('../sorted_list.csv', mode='w', newline='') as sorted_list_csv:
             headers = ['Position', 'Name', 'Year', 'URL', 'Description']
             writer = csv.DictWriter(sorted_list_csv, fieldnames=headers)
             writer.writeheader()
