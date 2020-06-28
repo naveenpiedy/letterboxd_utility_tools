@@ -67,6 +67,15 @@ class DataframeManipulationTest(unittest.TestCase):
         self.assertRaises(Exception, self.analysis_suite.count_item_imdb, "genre")
         self.assertEqual(self.analysis_suite.count_item_movie("my_rating").most_common(1), [(4.5, 4)])
 
-
+    def test_ratings_genre(self):
+        start_date = datetime.datetime(2020, 6, 1)
+        end_date = datetime.datetime(2020, 6, 30)
+        _, _ = self.analysis_suite.select_date_range(start_date, end_date)
+        result = self.analysis_suite.ratings_genre()
+        
+        self.assertEqual(result.get("Drama"),  4.06)
+        self.assertEqual(result.get("Comedy"),  3.32)
+        
+        
 if __name__ == '__main__':
     unittest.main()

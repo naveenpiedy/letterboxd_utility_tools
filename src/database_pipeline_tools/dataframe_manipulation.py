@@ -24,16 +24,16 @@ class AnalysisSuite:
         self.flag_imdb = 2
         self.flag_movie = 1
 
-    def __set_selected_df__(self, movie_dataframe, imdb_dataframe):
+    def _set_selected_df(self, movie_dataframe, imdb_dataframe):
         self.selected_movie_df = movie_dataframe
         self.selected_imdb_df = imdb_dataframe
 
-    def __get_imdb_df__(self, movie_dataframe):
+    def _get_imdb_df(self, movie_dataframe):
         list_imdb = movie_dataframe["imdb_id"].to_list()
         imdb_dataframe = self.imdb_df[self.imdb_df["imdb_id"].isin(list_imdb)]
         return imdb_dataframe
 
-    def __allowable_column_names__(self, column_name: str, flag: int):
+    def _allowable_column_names(self, column_name: str, flag: int):
         movie_col = {"id", "letter_boxd_id", "movie_title", "year_released", "my_rating", "watchdate" "letterboxd_link",
                      "rewatch", "published", "sha", "imdb_id"}
 
@@ -47,15 +47,15 @@ class AnalysisSuite:
     def get_ratings_range(self, lower_value: float, higher_value: float) -> (pd.DataFrame, pd.DataFrame):
         df = self.movie_df['my_rating'].between(lower_value, higher_value, inclusive=True)
         range_values = self.movie_df[df]
-        imdb_range = self.__get_imdb_df__(range_values)
-        self.__set_selected_df__(range_values, imdb_range)
+        imdb_range = self._get_imdb_df(range_values)
+        self._set_selected_df(range_values, imdb_range)
         return range_values, imdb_range
 
     def select_date_range(self, start: datetime.datetime, end: datetime.datetime) -> (pd.DataFrame, pd.DataFrame):
         movies_range = self.movie_df['watchdate'].between(start, end, inclusive=True)
         movies_period = self.movie_df[movies_range]
-        imdb_period = self.__get_imdb_df__(movies_period)
-        self.__set_selected_df__(movies_period, imdb_period)
+        imdb_period = self._get_imdb_df(movies_period)
+        self._set_selected_df(movies_period, imdb_period)
         return movies_period, imdb_period
 
     def calculate_runtime(self, imdb_period: pd.DataFrame = None) -> str:
@@ -66,8 +66,8 @@ class AnalysisSuite:
         flattened_list = itertools.chain(*list_runtimes)
         return pd.to_datetime(sum(flattened_list), unit="m").strftime('%H:%M')
 
-    def __count_item__(self, dataframe: pd.DataFrame, column: str, flag: int) -> Counter:
-        self.__allowable_column_names__(column, flag)
+    def _count_item(self, dataframe: pd.DataFrame, column: str, flag: int) -> Counter:
+        self._allowable_column_names(column, flag)
         list_values = dataframe[column].to_list()
         try:
             flattened_list = itertools.chain(*list_values)
@@ -79,20 +79,20 @@ class AnalysisSuite:
     def count_item_imdb(self, column: str, imdb_df: pd.DataFrame = None) -> Counter:
         if imdb_df is None:
             imdb_df = self.selected_imdb_df
-        return self.__count_item__(imdb_df, column, self.flag_imdb)
+        return self._count_item(imdb_df, column, self.flag_imdb)
 
     def count_item_movie(self, column: str, movie_df: pd.DataFrame = None) -> Counter:
         if movie_df is None:
             movie_df = self.selected_movie_df
-        return self.__count_item__(movie_df, column, self.flag_movie)
+        return self._count_item(movie_df, column, self.flag_movie)
 
     def ratings_genre(self, imdb_period: pd.DataFrame = None, movie_period: pd.DataFrame = None) -> OrderedDict:
         if imdb_period is None:
             imdb_period = self.selected_imdb_df
         if movie_period is None:
-            imdb_period = self.selected_movie_df
-        list_runtimes = imdb_period["genres"].to_list()
-        flattened_list = itertools.chain(*list_runtimes)
+            movie_period = self.selected_movie_df
+        genre_list = imdb_period["genres"].to_list()
+        flattened_list = itertools.chain(*genre_list)
         avg_ratings = {}
         for genre_type in flattened_list:
             mask = imdb_period.genres.apply(lambda x: genre_type in x)
