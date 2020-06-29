@@ -1,53 +1,32 @@
 import abc
 import csv
-from dataclasses import dataclass
-from datetime import date
+from collections import defaultdict
+import os
 
-from tabulate import tabulate
-
-
-@dataclass
-class ListMovieMetadata:
-    date: date
-    name: str
-    url: str
-    description: str = ''
-
-
-@dataclass
-class ListMovieObject:
-    position: int
-    name: str
-    year: date
-    url: str
-    metadata: ListMovieMetadata
-    description: str = ''
-
-    def __str__(self):
-        table = [["Position", self.position], ["Name", self.name],
-                 ["List Name", self.metadata.name], ["Year", self.year]]
-        output = tabulate(table, tablefmt='psql')
-        return output
+from src.movie_list_tools.dataclass_helpers import ListMovieMetadata, ListMovieObject
 
 
 class MovieSorterBaseClass(metaclass=abc.ABCMeta):
 
-    def __init__(self, file_location: str):
+    def __init__(self, file_location: str, list_name: str):
         """
         The __init__ function should perform end to end operation from reading the CSV to sorting to generating a csv.
         """
-        self.file_location = file_location
+        self.list_location = file_location
         self.list_item_dicts = dict()
         self.sorted_dict = dict()
         self.movie_names = list()
+        self.rewatch_dict = defaultdict(list)
         self.first_lines = []
+        self.list_name = list_name
 
     def _read_list_csv(self):
         """
         Reads LetterBoxd List csv. Preserves first four lines containing list metadata in self.first_lines
         for csv generation later.
         """
-        with open(self.file_location) as csvfile:
+        list_location = os.path.join(self.list_location, "lists", self.list_name)
+        with open(list_location) as csvfile:
             contents = csv.reader(csvfile, delimiter=',')
             meta = None
             for index, line in enumerate(contents):
@@ -72,8 +51,7 @@ class MovieSorterBaseClass(metaclass=abc.ABCMeta):
             writer = csv.DictWriter(sorted_list_csv, fieldnames=headers)
             for item in self.sorted_dict.values():
                 writer.writerow({"Position": item.position, "Name": item.name, "Year": item.year, "URL": item.url,
-                                 "Description": item.description})\
-
+                                 "Description": item.description})
 
     @abc.abstractmethod
     def _sorter(self, movie_list: list):
@@ -86,11 +64,11 @@ class MovieSorterBaseClass(metaclass=abc.ABCMeta):
 
 class MovieListMergeSorter(MovieSorterBaseClass):
 
-    def __init__(self, file_location: str):
+    def __init__(self, file_location: str, list_name: str):
         """
         The __init__ function should perform end to end operation from reading the CSV to sorting to generating a csv.
         """
-        super().__init__(file_location)
+        super().__init__(file_location, list_name)
         self._perform_merge_sort()
 
     def _sorter(self, movie_list: list):
@@ -154,4 +132,4 @@ class MovieListMergeSorter(MovieSorterBaseClass):
 
 
 if __name__ == '__main__':
-    MovieListMergeSorter("E:\\Movie Data\\letterboxd-naveenpiedy-jun\\lists\\all-time-favorites.csv")
+    MovieListMergeSorter("E:\\Movie Data\\letterboxd-naveenpiedy-jun", "all-time-favorites.csv")
