@@ -2,7 +2,8 @@ import csv
 import os
 from datetime import datetime
 
-from src.movie_list_tools.dataclass_helpers import CombinedListDiaryObject, DiaryMovieObject
+from src.movie_list_tools.dataclass_helpers import CombinedListDiaryObject, DiaryMovieObject, ListMovieObject, \
+    ListMovieMetadata
 from src.movie_list_tools.movie_list_sorter import ListBaseClass
 
 
@@ -106,7 +107,6 @@ class SortListDiary(ListDiaryBase):
 
 
 class GenerateListFromDiary(ListDiaryBase):
-
     index_col = {
         "date": 0,
         "year": 2,
@@ -121,13 +121,16 @@ class GenerateListFromDiary(ListDiaryBase):
         7: lambda x: datetime.strptime(x, '%Y-%m-%d').date()
     }
 
-    def __init__(self, file_location: str, list_name: str, col: str, lower_value, higher_value, reverse=True):
+    def __init__(self, file_location: str, list_name: str, col: str, lower_value, higher_value,
+                 listmetadata: ListMovieMetadata = None, reverse=True):
         super(GenerateListFromDiary, self).__init__(file_location, list_name)
         self.col, self.lower_value, self.higher_value = self._check_values(col, lower_value, higher_value)
+        self.listmetadata = listmetadata
 
     @classmethod
     def _check_values(cls, col, lower_value, higher_value):
         col = cls._check_col(col)
+
         col_type_mapper = {
             "date": datetime.date,
             "year": int,
@@ -149,18 +152,34 @@ class GenerateListFromDiary(ListDiaryBase):
 
     def _read_part_diary_csv(self):
         index = self.index_col.get(self.col)
-        self._read_diary_entry(lambda x: self.lower_value <= self.col_type_lambda.get(index)(x[index]) <= self.higher_value)
+        self._read_diary_entry(
+            lambda x: self.lower_value <= self.col_type_lambda.get(index)(x[index]) <= self.higher_value)
 
     def _sorter(self, movie_list: list = None):
         self.movie_names = sorted(self.diary_items.keys(), key=lambda x: getattr(self.diary_items.get(x), self.col))
 
     def _movie_object_sorter(self):
-        pass
+
+        if not self.listmetadata:
+            self.listmetadata = ListMovieMetadata(date=datetime.today(), name="Gen List", url="")
+        meta_data_headers = [[], "Date,Name,Tags,URL,Description".split(",")]
+        lm = self.listmetadata
+        meta_data_headers.append([f"{lm.date.strftime('%Y-%m-%d')}", f"{lm.name}", f"{lm.url}",  f"{lm.description}"])
+        meta_data_headers.append([])
+        meta_data_headers.append(['Position', 'Name', 'Year', 'URL', 'Description'])
+        self.first_lines = meta_data_headers
+        for pos, movie_name in enumerate(self.movie_names):
+            item = self.diary_items.get(movie_name)
+            self.sorted_dict[movie_name] = ListMovieObject(position=pos, name=movie_name, year=item.year, url=item.url,
+                                                           metadata=self.listmetadata)
+
 
 
 if __name__ == '__main__':
     SortListDiary("E:\\Movie Data\\letterboxd-naveenpiedy-jun", "watched-in-2020.csv", col="rating", reverse=False)
-    g = GenerateListFromDiary("E:\\Movie Data\\letterboxd-naveenpiedy-jun", "watched-in-2020.csv", col="rating", lower_value=5.0, higher_value=5.0)
+    g = GenerateListFromDiary("E:\\Movie Data\\letterboxd-naveenpiedy-jun", "watched-in-2020.csv", col="rating",
+                              lower_value=5.0, higher_value=5.0)
     g._read_part_diary_csv()
     g._sorter()
-    print(g.movie_names)
+    g._movie_object_sorter()
+    g._write_list_csv()

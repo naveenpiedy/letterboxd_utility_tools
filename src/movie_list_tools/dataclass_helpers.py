@@ -6,7 +6,7 @@ from datetime import date, datetime
 
 def make_default_diaryobj():
     return [DiaryMovieObject(date_=datetime.strptime('1700-1-1', '%Y-%m-%d').date(), name="None", year=1700,
-                             url="None", rating=float(-1), rewatch=False, tags=["None"],
+                             url="None", rating=float(-1), rewatch=False, tags={"None"},
                              watched_date=datetime.strptime('1700-1-1', '%Y-%m-%d').date())]
 
 
