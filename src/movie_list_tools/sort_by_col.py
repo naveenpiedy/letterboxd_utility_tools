@@ -22,24 +22,29 @@ class ListDiaryBase(ListBaseClass):
             raise Exception(f"Mentioned column name is not usable. Please use one of {columns_available}")
         return col
 
-    def _read_diary_entry(self, line):
+    def _read_diary_entry(self, func=lambda x: True):
         """
         Reads diary csv creates a neat dict with all items.
         """
-        if line[1] not in self.diary_items:
-            key = line[1]
-        else:
-            suffix_int = 1
-            while f"{line[1]} ({str(suffix_int)})" in self.diary_items:
-                suffix_int += 1
-            key = f"{line[1]} ({str(suffix_int)})"
-            self.rewatch_dict[line[1]].append(key)
+        with open(self.diary_file_location) as csvfile:
+            contents = csv.reader(csvfile, delimiter=',')
+            headers = next(contents)
+            for line in contents:
+                if func(line):
+                    if line[1] not in self.diary_items:
+                        key = line[1]
+                    else:
+                        suffix_int = 1
+                        while f"{line[1]} ({str(suffix_int)})" in self.diary_items:
+                            suffix_int += 1
+                        key = f"{line[1]} ({str(suffix_int)})"
+                        self.rewatch_dict[line[1]].append(key)
 
-        self.diary_items[key] = DiaryMovieObject(date_=datetime.strptime(line[0], '%Y-%m-%d').date(),
-                                                 name=line[1], year=int(line[2]), url=line[3],
-                                                 rating=float(line[4]), rewatch=line[5] == "Yes",
-                                                 tags=set(line[6].split(",")),
-                                                 watched_date=datetime.strptime(line[7], '%Y-%m-%d').date())
+                    self.diary_items[key] = DiaryMovieObject(date_=datetime.strptime(line[0], '%Y-%m-%d').date(),
+                                                             name=line[1], year=int(line[2]), url=line[3],
+                                                             rating=float(line[4]), rewatch=line[5] == "Yes",
+                                                             tags=set(line[6].split(",")),
+                                                             watched_date=datetime.strptime(line[7], '%Y-%m-%d').date())
 
 
 class SortListDiary(ListDiaryBase):
@@ -51,13 +56,7 @@ class SortListDiary(ListDiaryBase):
         self._perform_sort_list(reverse=reverse)
 
     def _read_diary_list_csv(self):
-
-        with open(self.diary_file_location) as csvfile:
-            contents = csv.reader(csvfile, delimiter=',')
-            headers = next(contents)
-            for line in contents:
-                if line[1] in self.movie_names:
-                    self._read_diary_entry(line)
+        self._read_diary_entry(lambda x: x[1] in self.movie_names)
 
     def _combine_dicts(self):
         """
@@ -149,14 +148,8 @@ class GenerateListFromDiary(ListDiaryBase):
         return col, lower_value, higher_value
 
     def _read_part_diary_csv(self):
-
         index = self.index_col.get(self.col)
-        with open(self.diary_file_location) as csvfile:
-            contents = csv.reader(csvfile, delimiter=',')
-            headers = next(contents)
-            for line in contents:
-                if self.lower_value <= self.col_type_lambda.get(index)(line[index]) <= self.higher_value:
-                    self._read_diary_entry(line)
+        self._read_diary_entry(lambda x: self.lower_value <= self.col_type_lambda.get(index)(x[index]) <= self.higher_value)
 
     def _sorter(self, movie_list: list = None):
         self.movie_names = sorted(self.diary_items.keys(), key=lambda x: getattr(self.diary_items.get(x), self.col))
@@ -169,4 +162,5 @@ if __name__ == '__main__':
     SortListDiary("E:\\Movie Data\\letterboxd-naveenpiedy-jun", "watched-in-2020.csv", col="rating", reverse=False)
     g = GenerateListFromDiary("E:\\Movie Data\\letterboxd-naveenpiedy-jun", "watched-in-2020.csv", col="rating", lower_value=5.0, higher_value=5.0)
     g._read_part_diary_csv()
-    print(g._sorter())
+    g._sorter()
+    print(g.movie_names)
