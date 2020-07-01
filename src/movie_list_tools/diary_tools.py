@@ -5,6 +5,7 @@ from datetime import datetime
 from src.movie_list_tools.dataclass_helpers import CombinedListDiaryObject, DiaryMovieObject, ListMovieObject, \
     ListMovieMetadata
 from src.movie_list_tools.movie_list_sorter import ListBaseClass
+from typing import Any
 
 
 class ListDiaryBase(ListBaseClass):
@@ -121,14 +122,29 @@ class GenerateListFromDiary(ListDiaryBase):
         7: lambda x: datetime.strptime(x, '%Y-%m-%d').date()
     }
 
-    def __init__(self, file_location: str, list_name: str, col: str, lower_value, higher_value,
-                 listmetadata: ListMovieMetadata = None, reverse=True):
+    def __init__(self, file_location: str, col: str, lower_value: Any, higher_value: Any,
+                 listmetadata: ListMovieMetadata = None, list_name: str = None, reverse=True):
+        """
+        Init function
+
+        :param file_location: Where you have your LetterBoxd CSV's.
+        :param list_name: Name of the list you want to generate
+        :param col: Column which you are using to generate the list -> date, year, rating, watched_date
+        :param lower_value: Lower bound value. Make sure to use proper datatype. example: 2.0 if using rating.
+        :param higher_value: Higher bound value. Make sure to use proper datatype. example: 5.0 if using rating.
+        :param listmetadata: Use dataclass ListMovieMetadata to give the metadata
+        :param reverse: If you want to generate the list in reverse order
+        """
         super(GenerateListFromDiary, self).__init__(file_location, list_name)
         self.col, self.lower_value, self.higher_value = self._check_values(col, lower_value, higher_value)
         self.listmetadata = listmetadata
+        self._perform_operation(reverse=reverse)
 
     @classmethod
-    def _check_values(cls, col, lower_value, higher_value):
+    def _check_values(cls, col: str, lower_value: Any, higher_value: Any):
+        """
+        Check if the values are of the proper datatype and col is proper column.
+        """
         col = cls._check_col(col)
 
         col_type_mapper = {
@@ -151,17 +167,30 @@ class GenerateListFromDiary(ListDiaryBase):
         return col, lower_value, higher_value
 
     def _read_part_diary_csv(self):
+        """
+        Reads only the relevant part of the diary.csv
+        """
         index = self.index_col.get(self.col)
         self._read_diary_entry(
             lambda x: self.lower_value <= self.col_type_lambda.get(index)(x[index]) <= self.higher_value)
 
-    def _sorter(self, movie_list: list = None):
-        self.movie_names = sorted(self.diary_items.keys(), key=lambda x: getattr(self.diary_items.get(x), self.col))
+    def _sorter(self, reverse: bool = False, movie_list: list = None):
+        """
+        Sorts the movies based on the column, lower_value and higher_value.
+        :param reverse: Boolean used to specify if the order should be in the reverse order.
+        :param movie_list: list but is only there for debugging purposes.
+        """
+        self.movie_names = sorted(self.diary_items.keys(), key=lambda x: getattr(self.diary_items.get(x), self.col),
+                                  reverse=reverse)
 
     def _movie_object_sorter(self):
-
+        """
+        Creates List object in sorted fashion for self._write_csv()
+        """
         if not self.listmetadata:
-            self.listmetadata = ListMovieMetadata(date=datetime.today(), name="Gen List", url="")
+            self.listmetadata = ListMovieMetadata(date=datetime.today(),
+                                                  name=self.list_name if self.list_name else "Gen List",
+                                                  url="")
         meta_data_headers = [[], "Date,Name,Tags,URL,Description".split(",")]
         lm = self.listmetadata
         meta_data_headers.append([f"{lm.date.strftime('%Y-%m-%d')}", f"{lm.name}", f"{lm.url}",  f"{lm.description}"])
@@ -173,13 +202,16 @@ class GenerateListFromDiary(ListDiaryBase):
             self.sorted_dict[movie_name] = ListMovieObject(position=pos, name=movie_name, year=item.year, url=item.url,
                                                            metadata=self.listmetadata)
 
+    def _perform_operation(self, reverse):
+        """
+        The whole operation from top to bottom.
+        """
+        self._read_part_diary_csv()
+        self._sorter(reverse)
+        self._movie_object_sorter()
+        self._write_list_csv()
 
 
 if __name__ == '__main__':
-    SortListDiary("E:\\Movie Data\\letterboxd-naveenpiedy-jun", "watched-in-2020.csv", col="rating", reverse=False)
-    g = GenerateListFromDiary("E:\\Movie Data\\letterboxd-naveenpiedy-jun", "watched-in-2020.csv", col="rating",
-                              lower_value=5.0, higher_value=5.0)
-    g._read_part_diary_csv()
-    g._sorter()
-    g._movie_object_sorter()
-    g._write_list_csv()
+    GenerateListFromDiary(file_location="E:\\Movie Data\\letterboxd-naveenpiedy-jun", col="rating", lower_value=5.0,
+                          higher_value=5.0)
