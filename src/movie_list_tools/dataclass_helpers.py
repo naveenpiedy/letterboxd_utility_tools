@@ -41,7 +41,7 @@ class DiaryMovieObject:
     year: int
     url: str
     rating: float
-    tags: list
+    tags: set
     watched_date: date
     rewatch: bool = False
 

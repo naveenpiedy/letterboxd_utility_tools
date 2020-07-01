@@ -6,7 +6,7 @@ import os
 from src.movie_list_tools.dataclass_helpers import ListMovieMetadata, ListMovieObject
 
 
-class MovieSorterBaseClass(metaclass=abc.ABCMeta):
+class ListBaseClass(metaclass=abc.ABCMeta):
 
     def __init__(self, file_location: str, list_name: str):
         """
@@ -62,7 +62,7 @@ class MovieSorterBaseClass(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
 
-class MovieListMergeSorter(MovieSorterBaseClass):
+class MovieListMergeSorter(ListBaseClass):
 
     def __init__(self, file_location: str, list_name: str):
         """
