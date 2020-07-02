@@ -34,8 +34,8 @@ class AnalysisSuite:
         return imdb_dataframe
 
     def _allowable_column_names(self, column_name: str, flag: int):
-        movie_col = {"id", "letter_boxd_id", "movie_title", "year_released", "my_rating", "watchdate" "letterboxd_link",
-                     "rewatch", "published", "sha", "imdb_id"}
+        movie_col = {"id", "letter_boxd_id", "movie_title", "year_released", "my_rating", "watchdate",
+                     "letterboxd_link", "rewatch", "published", "sha", "imdb_id"}
 
         imdb_col = {"id", "imdb_id", "main_db", "cast", "genres", "director", "rating", "votes", "title", "year",
                     "runtimes", "composers", "languages"}

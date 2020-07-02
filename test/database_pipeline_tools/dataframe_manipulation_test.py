@@ -1,13 +1,18 @@
 import datetime
+import os
 import unittest
 import pandas as pd
 import pandas.testing as pd_testing
 from src.database_pipeline_tools.dataframe_manipulation import AnalysisSuite
 
 
+def file_read(filename):
+    return os.path.join(os.path.dirname(__file__), filename)
+
+
 class DataframeManipulationTest(unittest.TestCase):
-    movie_df = pd.read_pickle("movie_dataframe.pickle")
-    imdb_df = pd.read_pickle("imdb_dataframe.pickle")
+    movie_df = pd.read_pickle(file_read("movie_dataframe.pickle"))
+    imdb_df = pd.read_pickle(file_read("imdb_dataframe.pickle"))
     analysis_suite = AnalysisSuite(movie_df, imdb_df)
 
     def assertDataframeEqual(self, a, b, msg=None):
@@ -26,11 +31,11 @@ class DataframeManipulationTest(unittest.TestCase):
         imdb_id_mdf = set(selected_movie_df["imdb_id"].tolist())
         imdb_id_idf = set(selected_imdb_df["imdb_id"].tolist())
 
-        self.assertDataframeEqual(selected_movie_df, pd.read_pickle("movie_range_dataframe.pickle"), msg)
-        self.assertDataframeEqual(selected_imdb_df, pd.read_pickle("imdb_range_dataframe.pickle"), msg)
+        self.assertDataframeEqual(selected_movie_df, pd.read_pickle(file_read("movie_range_dataframe.pickle")), msg)
+        self.assertDataframeEqual(selected_imdb_df, pd.read_pickle(file_read("imdb_range_dataframe.pickle")), msg)
         self.assertEqual({1.0, 1.5, 2.0}, ratings_list)
         self.assertEqual(imdb_id_idf, imdb_id_mdf)
-        
+
     def test_select_date_range(self):
         start_date = datetime.datetime(2020, 6, 1)
         end_date = datetime.datetime(2020, 6, 30)
@@ -40,8 +45,9 @@ class DataframeManipulationTest(unittest.TestCase):
         watched_date_mdf = set(selected_movie_df["watchdate"].tolist())
         msg = f"Assertion error raised in {self.test_select_date_range.__name__}"
 
-        self.assertDataframeEqual(selected_movie_df, pd.read_pickle("movie_daterange_dataframe.pickle"), msg)
-        self.assertDataframeEqual(selected_imdb_df, pd.read_pickle("imdb_daterange_dataframe.pickle"), msg)
+        self.assertDataframeEqual(selected_movie_df,
+                                  pd.read_pickle(file_read("movie_daterange_dataframe.pickle")), msg)
+        self.assertDataframeEqual(selected_imdb_df, pd.read_pickle(file_read("imdb_daterange_dataframe.pickle")), msg)
         self.assertEqual(imdb_id_idf, imdb_id_mdf)
         self.assertEqual({True}, {start_date <= i <= end_date for i in watched_date_mdf})
 
@@ -49,15 +55,15 @@ class DataframeManipulationTest(unittest.TestCase):
         start_date = datetime.datetime(2020, 6, 1)
         end_date = datetime.datetime(2020, 6, 30)
         _, _ = self.analysis_suite.select_date_range(start_date, end_date)
-        
+
         self.assertEqual(self.analysis_suite.calculate_runtime(), "10:16")
         self.assertEqual(self.analysis_suite.calculate_runtime(imdb_period=self.imdb_df), "23:34")
-    
+
     def test_count_item(self):
         start_date = datetime.datetime(2020, 6, 1)
         end_date = datetime.datetime(2020, 6, 30)
         _, _ = self.analysis_suite.select_date_range(start_date, end_date)
-        
+
         self.assertEqual(self.analysis_suite.count_item_imdb("year").most_common(1), [(2001, 3)])
         self.assertEqual(self.analysis_suite.count_item_imdb("genres").most_common(1), [("Romance", 11)])
         self.assertEqual(self.analysis_suite.count_item_imdb("year",
@@ -72,10 +78,10 @@ class DataframeManipulationTest(unittest.TestCase):
         end_date = datetime.datetime(2020, 6, 30)
         _, _ = self.analysis_suite.select_date_range(start_date, end_date)
         result = self.analysis_suite.ratings_genre()
-        
+
         self.assertEqual(result.get("Drama"),  4.06)
         self.assertEqual(result.get("Comedy"),  3.32)
-        
-        
+
+
 if __name__ == '__main__':
     unittest.main()

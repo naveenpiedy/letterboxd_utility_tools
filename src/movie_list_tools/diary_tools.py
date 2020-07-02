@@ -30,7 +30,7 @@ class ListDiaryBase(ListBaseClass):
         """
         with open(self.diary_file_location) as csvfile:
             contents = csv.reader(csvfile, delimiter=',')
-            headers = next(contents)
+            next(contents)
             for line in contents:
                 if func(line):
                     if line[1] not in self.diary_items:
@@ -46,7 +46,8 @@ class ListDiaryBase(ListBaseClass):
                                                              name=line[1], year=int(line[2]), url=line[3],
                                                              rating=float(line[4]), rewatch=line[5] == "Yes",
                                                              tags=set(line[6].split(",")),
-                                                             watched_date=datetime.strptime(line[7], '%Y-%m-%d').date())
+                                                             watched_date=datetime.strptime(line[7],
+                                                                                            '%Y-%m-%d').date())
 
 
 class SortListDiary(ListDiaryBase):
@@ -158,11 +159,12 @@ class GenerateListFromDiary(ListDiaryBase):
                             f"For {col} use {col_type_mapper.get(col)}")
 
         if not isinstance(higher_value, col_type_mapper.get(col)):
-            raise Exception(f"Mentioned higher value is not of the right data type. You have given {type(higher_value)}"
+            raise Exception(f"Mentioned higher value is not of the right data type. You have given "
+                            f"{type(higher_value)}"
                             f"For {col} use {col_type_mapper.get(col)}")
 
         if lower_value > higher_value:
-            raise Exception(f"Lower Value is greater than higher value, please change")
+            raise Exception("Lower Value is greater than higher value, please change")
 
         return col, lower_value, higher_value
 

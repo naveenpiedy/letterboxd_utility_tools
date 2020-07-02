@@ -27,7 +27,7 @@ class MovieListMergeSorter(ListBaseClass):
             left_half_index = right_half_index = keeper = 0
 
             while left_half_index < len(left_side) and right_half_index < len(right_side):
-                print(f"\n\n")
+                print("\n\n")
                 print(f"Left Side: {left_side}, Right Side: {right_side}")
                 print(f"1.{left_side[left_half_index]}\n2.{right_side[right_half_index]}")
                 answer = input("which one is greater 1 or 2?\n")
