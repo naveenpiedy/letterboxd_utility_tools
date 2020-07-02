@@ -2,6 +2,7 @@ import abc
 import csv
 from collections import defaultdict
 import os
+import logging
 
 from src.movie_list_tools.dataclass_helpers import ListMovieMetadata, ListMovieObject
 
@@ -43,7 +44,13 @@ class ListBaseClass(metaclass=abc.ABCMeta):
         """
         Generates a LetterBoxd compliant list csv based on order in self.sorted_dict
         """
-        with open('../../sorted_list.csv', mode='w', newline='') as sorted_list_csv:
+        try:
+            os.makedirs(os.path.join(self.list_location, "output"))
+        except FileExistsError:
+            logging.info("File already exists")
+
+        with open(os.path.join(self.list_location, "output", f"{self.list_name.split('.')[0]}_output.csv"),
+                  mode='w', newline='') as sorted_list_csv:
             headers = ['Position', 'Name', 'Year', 'URL', 'Description']
             first_lines_writer = csv.writer(sorted_list_csv, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for line in self.first_lines:
