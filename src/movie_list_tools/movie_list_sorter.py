@@ -48,8 +48,13 @@ class ListBaseClass(metaclass=abc.ABCMeta):
             os.makedirs(os.path.join(self.list_location, "output"))
         except FileExistsError:
             logging.info("File already exists")
-
-        with open(os.path.join(self.list_location, "output", f"{self.list_name.split('.')[0]}_output.csv"),
+        if self.list_name:
+            self.list_name = self.list_name.split('.')[0]
+        elif getattr(self, "listmetadata"):
+            self.list_name = getattr(self, "listmetadata").name
+        else:
+            self.list_name = "gen"
+        with open(os.path.join(self.list_location, "output", f"{self.list_name}_output.csv"),
                   mode='w', newline='') as sorted_list_csv:
             headers = ['Position', 'Name', 'Year', 'URL', 'Description']
             first_lines_writer = csv.writer(sorted_list_csv, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)

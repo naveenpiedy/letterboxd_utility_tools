@@ -9,6 +9,12 @@ from typing import Any
 
 
 class ListDiaryBase(ListBaseClass):
+    def _sorter(self, movie_list: list):
+        pass
+
+    def _movie_object_sorter(self):
+        pass
+
     def __init__(self, file_location: str, list_name: str):
         super().__init__(file_location, list_name)
         self.diary_file_location = os.path.join(file_location, "diary.csv")
@@ -43,8 +49,11 @@ class ListDiaryBase(ListBaseClass):
                         self.rewatch_dict[line[1]].append(key)
 
                     self.diary_items[key] = DiaryMovieObject(date_=datetime.strptime(line[0], '%Y-%m-%d').date(),
-                                                             name=line[1], year=int(line[2]), url=line[3],
-                                                             rating=float(line[4]), rewatch=line[5] == "Yes",
+                                                             name=line[1],
+                                                             year=int(line[2]),
+                                                             url=line[3],
+                                                             rating=float(line[4]),
+                                                             rewatch=line[5] == "Yes",
                                                              tags=set(line[6].split(",")),
                                                              watched_date=datetime.strptime(line[7],
                                                                                             '%Y-%m-%d').date())
@@ -124,7 +133,7 @@ class GenerateListFromDiary(ListDiaryBase):
     }
 
     def __init__(self, file_location: str, col: str, lower_value: Any, higher_value: Any,
-                 listmetadata: ListMovieMetadata = None, list_name: str = None, reverse=True):
+                 listmetadata: ListMovieMetadata = None, list_name: str = None, reverse: bool = True):
         """
         Init function
 
@@ -182,7 +191,8 @@ class GenerateListFromDiary(ListDiaryBase):
         :param reverse: Boolean used to specify if the order should be in the reverse order.
         :param movie_list: list but is only there for debugging purposes.
         """
-        self.movie_names = sorted(self.diary_items.keys(), key=lambda x: getattr(self.diary_items.get(x), self.col),
+        self.movie_names = sorted(self.diary_items.keys(),
+                                  key=lambda x: getattr(self.diary_items.get(x), self.col),
                                   reverse=reverse)
 
     def _movie_object_sorter(self):
@@ -195,11 +205,11 @@ class GenerateListFromDiary(ListDiaryBase):
                                                   url="")
         meta_data_headers = [[], "Date,Name,Tags,URL,Description".split(",")]
         lm = self.listmetadata
-        meta_data_headers.append([f"{lm.date.strftime('%Y-%m-%d')}", f"{lm.name}", f"{lm.url}",  f"{lm.description}"])
+        meta_data_headers.append([f"{lm.date.strftime('%Y-%m-%d')}", f"{lm.name}", f"{lm.url}", f"{lm.description}"])
         meta_data_headers.append([])
         meta_data_headers.append(['Position', 'Name', 'Year', 'URL', 'Description'])
         self.first_lines = meta_data_headers
-        for pos, movie_name in enumerate(self.movie_names):
+        for pos, movie_name in enumerate(self.movie_names, start=1):
             item = self.diary_items.get(movie_name)
             self.sorted_dict[movie_name] = ListMovieObject(position=pos, name=movie_name, year=item.year, url=item.url,
                                                            metadata=self.listmetadata)
