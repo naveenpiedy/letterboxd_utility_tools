@@ -24,6 +24,14 @@ If you want to make use of database scripts, you need [PostGresSQL](https://www.
 
 Will update more instructions on how to get the DB set up (this is still a WIP). Minor changes to [config file](https://github.com/naveenpiedy/letterboxd_utility_tools/blob/master/src/database_pipeline_tools/base.py) should be all that is needed.  
 
+## Using the scripts
+
+This is still a work in progress. Will definitely add CLI support or at least a main script file to call other scripts.
+
+For now, database scripts can be found under `src/database_pipeline_tools` [here](https://github.com/naveenpiedy/letterboxd_utility_tools/tree/master/src/database_pipeline_tools) and list tools under `src/movie_list_tools` [here](https://github.com/naveenpiedy/letterboxd_utility_tools/tree/master/src/movie_list_tools).
+
+Alternatively you can refer to tests for now on how to run the scripts. If you need more info, feel free to reach me. 
+
 ## Running the tests
 
 Tests were written using Python's unittest and is hooked up to Travis. Build status can be found on the top. If you want to run tests locally, running the following command from the root of the directory will suffice.
