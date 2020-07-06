@@ -5,6 +5,9 @@ from src.database_pipeline_tools.base import Base, engine, Session
 from src.database_pipeline_tools.models import MovieDatabase, sha_gen, ExtensionIMDB
 import imdb
 
+logging.getLogger("imdb").setLevel(logging.WARNING)
+logging.basicConfig(level=logging.INFO)
+
 
 class LetterBoxdRss:
 
@@ -44,6 +47,7 @@ class LetterBoxdRss:
         for item in self.entries:
             id_value = item.get("id").split('-')
             type_item = id_value[1]
+            logging.debug(f"Reading item \"{item.get('title')}\" in entry_sorter")
             if type_item in type_of:
                 self.type_entry[type_item].add(item)
             else:
@@ -66,6 +70,7 @@ class LetterBoxdRss:
                     movie = (self.imdb_obj.search_movie(f"{title} ({year})")[0])
                     movie_id = movie.getID()
                     item["IMDB_ID"] = movie_id
+                    logging.info(f"IMDB id used for {title} is {movie_id}")
             except Exception as e:
                 logging.warning(f"Exception Caught for movie {title}. Exception: {e}")
                 continue
@@ -136,6 +141,8 @@ class LetterBoxdRss:
                     item["imdb_db_obj"] = imdb_ids_so_far[imdb_id]
                 movie_obj = MovieDatabase(**item)
                 self.session.add(movie_obj)
+                logging.info(f"{item.get('letterboxd_filmtitle')} watched on {item.get('letterboxd_watcheddate')} "
+                             f"added to be database. Relevant IMDB ID : {imdb_id}. Relevant SHA: {sha_generated}")
                 sha_so_far.add(sha_generated)
 
         self.session.commit()
