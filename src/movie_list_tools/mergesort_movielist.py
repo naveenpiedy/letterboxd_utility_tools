@@ -28,8 +28,13 @@ class MovieListMergeSorter(ListBaseClass):
 
             while left_half_index < len(left_side) and right_half_index < len(right_side):
                 print("\n\n")
-                print(f"Left Side: {left_side}, Right Side: {right_side}")
-                print(f"1.{left_side[left_half_index]}\n2.{right_side[right_half_index]}")
+                print(f"Left Side: {left_side}Right Side: {right_side}")
+                print("")
+                print(f"{'1.'+ left_side[left_half_index]:^40}")
+                print(f"{self.list_item_dicts.get(left_side[left_half_index])}")
+                print("")
+                print(f"{'2.'+right_side[right_half_index]:^40}")
+                print(f"{self.list_item_dicts.get(right_side[right_half_index])}")
                 answer = input("which one is greater 1 or 2?\n")
                 if answer == "1":
                     movie_list[keeper] = left_side[left_half_index]
@@ -40,7 +45,7 @@ class MovieListMergeSorter(ListBaseClass):
                     right_half_index += 1
                     keeper += 1
                 else:
-                    print("Wrong Choice! Please input only '1' or '2'")
+                    print("Invalid Choice! Please input only '1' or '2'")
 
             while left_half_index < len(left_side):
                 movie_list[keeper] = left_side[left_half_index]
