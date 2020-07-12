@@ -1,21 +1,18 @@
 import json
+import datetime
 
-from src.movie_list_tools.movie_list_sorter import ListBaseClass
 from src.database_pipeline_tools.base import engine, Session
 from src.database_pipeline_tools.models import MovieDatabase, ExtensionIMDB
 from sqlalchemy import ARRAY, cast, String
 
 
-class DatabaseListTools(ListBaseClass):
+class DatabaseListTools:
 
-    def __init__(self, file_location: str = None, list_name: str = None, database_flag: int = 0, json_input=None):
-        super().__init__(file_location, list_name)
+    def __init__(self):
         self.session = Session(bind=engine)
-        self.database_flag = database_flag
-        self.input_json = json.loads(json_input)
-        self.main_db_columns, self.imdb_columns = self._check_col(self.input_json)
-        self._checl_val(self.main_db_columns, self.imdb_columns, self.input_json)
-        self.select_from_database(self.main_db_columns, self.imdb_columns, self.input_json)
+        self.input_json = None
+        self.main_db_columns = None
+        self.imdb_columns = None
 
     def _check_col(self, json_input):
         main_db_columns = set()
@@ -54,6 +51,14 @@ class DatabaseListTools(ListBaseClass):
                     key_type = main_db_type.get(key)
                 else:
                     key_type = imdb_type.get(key)
+
+                try:
+                    if key_type is datetime.date:
+                        input_json[key] = datetime.datetime.strptime(value, "%Y-%m-%d").date()
+                        continue
+                except Exception:
+                    raise Exception(f"For {key}, the date format is off. Please use Y-M-D.")
+
                 if isinstance(value, dict):
                     lower = key_type(value.get('lower'))
                     higher = key_type(value.get('higher'))
@@ -69,7 +74,7 @@ class DatabaseListTools(ListBaseClass):
             except Exception:
                 raise Exception(f"For {key}, the data_type of {value} if off.")
 
-    def select_from_database(self, main_db_cols, imdb_cols, input_json):
+    def _select_from_database(self, main_db_cols, imdb_cols, input_json):
         query = self.session.query(MovieDatabase).join(ExtensionIMDB)
         try:
             for key in main_db_cols:
@@ -77,7 +82,7 @@ class DatabaseListTools(ListBaseClass):
                 if isinstance(value, dict):
                     query = query.filter(getattr(MovieDatabase, key).between(value.get('lower'), value.get('higher')))
                 elif isinstance(value, list):
-                    query = query.filter(getattr(ExtensionIMDB, key).contains(cast(value, ARRAY(String))))
+                    query = query.filter(getattr(MovieDatabase, key).contains(cast(value, ARRAY(String))))
                 else:
                     query = query.filter(getattr(MovieDatabase, key) == value)
             for key in imdb_cols:
@@ -88,19 +93,18 @@ class DatabaseListTools(ListBaseClass):
                     query = query.filter(getattr(ExtensionIMDB, key).contains(cast(value, ARRAY(String))))
                 else:
                     query = query.filter(getattr(ExtensionIMDB, key) == value)
-            for movie in query:
-                print(movie.movie_title)
+            result_list = []
+            for item in query:
+                result_list.append(item.as_dict())
+            return json.dumps(result_list)
         except Exception:
             raise Exception
 
-        # for movie in self.session.query(MovieDatabase).filter(MovieDatabase.my_rating.between("4.0", "4.5")):
-        #     print(movie.imdb_db.title, movie.imdb_db.director)
-
-    def _sorter(self, movie_list: list):
-        pass
-
-    def _movie_object_sorter(self):
-        pass
+    def query_db(self, json_input):
+        self.input_json = json.loads(json_input)
+        self.main_db_columns, self.imdb_columns = self._check_col(self.input_json)
+        self._checl_val(self.main_db_columns, self.imdb_columns, self.input_json)
+        return self._select_from_database(self.main_db_columns, self.imdb_columns, self.input_json)
 
 
 if __name__ == '__main__':
@@ -109,14 +113,11 @@ if __name__ == '__main__':
             "lower": 3,
             "higher": 5
         },
-        "languages": ["Tamil"],
         "genres": ["Comedy"],
         "rewatch": True,
-        "runtimes": {
-            "lower": 60,
-            "higher": 150
-        },
+        "director": ["Wes Anderson"]
     }
     data = json.dumps(data)
-    db = DatabaseListTools(json_input=data)
+    db = DatabaseListTools()
+    print(db.query_db(data))
     # db._checl_val("id", 1, "233")
