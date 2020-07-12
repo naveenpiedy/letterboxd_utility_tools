@@ -139,9 +139,9 @@ class DatabaseQueryTool:
                             query = query.filter(getattr(argument[1], key).overlap(cast(value, ARRAY(String))))
                     else:
                         query = query.filter(getattr(argument[1], key) == value)
-            result_list = []
+            result_list = dict()
             for item in query:
-                result_list.append(item.as_dict())
+                result_list[item.movie_title] = item.as_dict()
             return json.dumps(result_list)
         except Exception:
             raise Exception
