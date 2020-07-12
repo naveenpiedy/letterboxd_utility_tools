@@ -26,7 +26,7 @@ class ExtensionIMDB(Base):
     votes = Column(BigInteger)
     title = Column(String)
     year = Column(Integer)
-    runtimes = Column(ARRAY(Integer))
+    runtimes = Column(Integer)
     composers = Column(String)
     languages = Column(ARRAY(String))
 

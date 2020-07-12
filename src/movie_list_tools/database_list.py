@@ -77,7 +77,7 @@ class DatabaseListTools(ListBaseClass):
                 if isinstance(value, dict):
                     query = query.filter(getattr(MovieDatabase, key).between(value.get('lower'), value.get('higher')))
                 elif isinstance(value, list):
-                    query = query.filter(getattr(MovieDatabase, key).any(value)).all()
+                    query = query.filter(getattr(ExtensionIMDB, key).contains(cast(value, ARRAY(String))))
                 else:
                     query = query.filter(getattr(MovieDatabase, key) == value)
             for key in imdb_cols:
@@ -112,6 +112,10 @@ if __name__ == '__main__':
         "languages": ["Tamil"],
         "genres": ["Comedy"],
         "rewatch": True,
+        "runtimes": {
+            "lower": 60,
+            "higher": 150
+        },
     }
     data = json.dumps(data)
     db = DatabaseListTools(json_input=data)
