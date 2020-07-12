@@ -1,10 +1,11 @@
 import hashlib
 
-from sqlalchemy import Column, String, Integer, Date, Float, Boolean, DateTime, ForeignKey, ARRAY, BigInteger
+from sqlalchemy import Column, String, Integer, Date, Float, Boolean, DateTime, ForeignKey, BigInteger
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import ARRAY
 
 from src.database_pipeline_tools.base import Base
-from datetime import datetime
+from datetime import datetime, date
 
 
 def sha_gen(movie_title, watchdate):
@@ -25,7 +26,7 @@ class ExtensionIMDB(Base):
     votes = Column(BigInteger)
     title = Column(String)
     year = Column(Integer)
-    runtimes = Column(ARRAY(Integer))
+    runtimes = Column(Integer)
     composers = Column(String)
     languages = Column(ARRAY(String))
 
@@ -41,6 +42,9 @@ class ExtensionIMDB(Base):
         self.runtimes = kwargs.get("runtimes")
         self.composers = kwargs.get("composers")
         self.languages = kwargs.get("languages")
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class MovieDatabase(Base):
@@ -86,3 +90,16 @@ class MovieDatabase(Base):
             return True
         else:
             return False
+
+    def as_dict(self):
+        ret_dict = dict()
+        for item in self.__table__.columns:
+            if item.type.python_type is date:
+                ret_dict[item.name] = getattr(self, item.name).strftime('%Y/%m/%d')
+                continue
+            elif item.type.python_type is datetime:
+                ret_dict[item.name] = getattr(self, item.name).strftime("%Y/%m/%dT%H:%M:%S")
+                continue
+            ret_dict[item.name] = getattr(self, item.name)
+        ret_dict["imdb_info"] = self.imdb_db.as_dict()
+        return ret_dict

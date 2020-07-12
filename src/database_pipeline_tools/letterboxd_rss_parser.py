@@ -106,7 +106,7 @@ class LetterBoxdRss:
 
         value = movie.get("runtimes")
         if value:
-            imdb_args["runtimes"] = [int(i) for i in value]
+            imdb_args["runtimes"] = int(value[0])
         imdb_args["imdb_id"] = movie_id
         return imdb_args
 
