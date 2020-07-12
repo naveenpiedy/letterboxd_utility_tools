@@ -7,7 +7,7 @@ from src.database_pipeline_tools.models import MovieDatabase, ExtensionIMDB
 from sqlalchemy import ARRAY, cast, String
 
 
-class DatabaseListTools:
+class DatabaseQueryTool:
     """
     Sample Input Json.
 
@@ -142,7 +142,6 @@ class DatabaseListTools:
             result_list = []
             for item in query:
                 result_list.append(item.as_dict())
-                print(item.movie_title, item.imdb_db.genres)
             return json.dumps(result_list)
         except Exception:
             raise Exception
@@ -169,5 +168,5 @@ if __name__ == '__main__':
     }
 
     data = json.dumps(data)
-    db = DatabaseListTools()
+    db = DatabaseQueryTool()
     print(db.query_db(data))
