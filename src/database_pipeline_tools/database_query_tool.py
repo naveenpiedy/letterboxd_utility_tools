@@ -54,7 +54,16 @@ class DatabaseListTools:
 
                 try:
                     if key_type is datetime.date:
-                        input_json[key] = datetime.datetime.strptime(value, "%Y-%m-%d").date()
+                        if isinstance(value, dict):
+                            lower = datetime.datetime.strptime(value.get('lower'), "%Y-%m-%d").date()
+                            higher = datetime.datetime.strptime(value.get('higher'), "%Y-%m-%d").date()
+                            if lower > higher:
+                                raise Exception(f"For {key}, the lower and higher values need to be interchanged")
+                            else:
+                                input_json[key]['lower'] = lower
+                                input_json[key]['higher'] = higher
+                        else:
+                            input_json[key] = datetime.datetime.strptime(value, "%Y-%m-%d").date()
                         continue
                 except Exception:
                     raise Exception(f"For {key}, the date format is off. Please use Y-M-D.")
@@ -76,23 +85,18 @@ class DatabaseListTools:
 
     def _select_from_database(self, main_db_cols, imdb_cols, input_json):
         query = self.session.query(MovieDatabase).join(ExtensionIMDB)
+        arguments = [(main_db_cols, MovieDatabase), (imdb_cols, ExtensionIMDB)]
         try:
-            for key in main_db_cols:
-                value = input_json.get(key)
-                if isinstance(value, dict):
-                    query = query.filter(getattr(MovieDatabase, key).between(value.get('lower'), value.get('higher')))
-                elif isinstance(value, list):
-                    query = query.filter(getattr(MovieDatabase, key).contains(cast(value, ARRAY(String))))
-                else:
-                    query = query.filter(getattr(MovieDatabase, key) == value)
-            for key in imdb_cols:
-                value = input_json.get(key)
-                if isinstance(value, dict):
-                    query = query.filter(getattr(ExtensionIMDB, key).between(value.get('lower'), value.get('higher')))
-                elif isinstance(value, list):
-                    query = query.filter(getattr(ExtensionIMDB, key).contains(cast(value, ARRAY(String))))
-                else:
-                    query = query.filter(getattr(ExtensionIMDB, key) == value)
+            for argument in arguments:
+                for key in argument[0]:
+                    value = input_json.get(key)
+                    if isinstance(value, dict):
+                        query = query.filter(
+                            getattr(argument[1], key).between(value.get('lower'), value.get('higher')))
+                    elif isinstance(value, list):
+                        query = query.filter(getattr(argument[1], key).contains(cast(value, ARRAY(String))))
+                    else:
+                        query = query.filter(getattr(argument[1], key) == value)
             result_list = []
             for item in query:
                 result_list.append(item.as_dict())
@@ -113,9 +117,12 @@ if __name__ == '__main__':
             "lower": 3,
             "higher": 5
         },
-        "genres": ["Comedy"],
         "rewatch": True,
-        "director": ["Wes Anderson"]
+        "director": ["Wes Anderson"],
+        "watchdate": {
+            "lower": "2020-05-01",
+            "higher": "2020-06-30"
+        }
     }
     data = json.dumps(data)
     db = DatabaseListTools()
