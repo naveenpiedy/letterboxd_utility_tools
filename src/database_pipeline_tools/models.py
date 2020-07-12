@@ -1,7 +1,8 @@
 import hashlib
 
-from sqlalchemy import Column, String, Integer, Date, Float, Boolean, DateTime, ForeignKey, ARRAY, BigInteger
+from sqlalchemy import Column, String, Integer, Date, Float, Boolean, DateTime, ForeignKey, BigInteger
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import ARRAY
 
 from src.database_pipeline_tools.base import Base
 from datetime import datetime
