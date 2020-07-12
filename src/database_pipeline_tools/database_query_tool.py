@@ -1,3 +1,4 @@
+import itertools
 import json
 import datetime
 
@@ -7,6 +8,41 @@ from sqlalchemy import ARRAY, cast, String
 
 
 class DatabaseListTools:
+    """
+    Sample Input Json.
+
+    {
+        "my_rating": {
+            "lower": 3,
+            "higher": 5
+        },
+        "genres": [["Drama"], ["Romance"]],
+        "watchdate": {
+            "lower": "2020-04-01",
+            "higher": "2020-06-30"
+        },
+        "director": ["Wes Anderson", "Mani Ratnam"]
+    }
+
+
+    Selecting movies based on a range, for example 3 - 4 stars or between April 1 - June 1, use 'lower' and 'higher'
+    Dates should be be of format `yyyy-mm-dd`
+
+    List Arguments example:
+
+    "genres": [["Drama"], ["Romance"]]
+
+    Will return
+    Alaipayuthey ['Drama', 'Musical', 'Romance']
+
+    "genres": ["Drama", "Romance"]
+
+    Will return
+    The Darjeeling Limited ['Adventure', 'Comedy', 'Drama']
+    Alaipayuthey ['Drama', 'Musical', 'Romance']
+
+    The difference being that nested lists will emulate AND while a single list will emulate OR.
+    """
 
     def __init__(self):
         self.session = Session(bind=engine)
@@ -74,7 +110,8 @@ class DatabaseListTools:
                     if lower > higher:
                         raise Exception(f"For {key}, the lower and higher values need to be interchanged")
                 elif isinstance(value, list):
-                    for item in value:
+                    flat_values = itertools.chain(*value)
+                    for item in flat_values:
                         if not isinstance(item, key_type):
                             raise Exception(f"For {key}, the data_type of {item} if off. It needs to be of {key_type}")
                 else:
@@ -94,12 +131,18 @@ class DatabaseListTools:
                         query = query.filter(
                             getattr(argument[1], key).between(value.get('lower'), value.get('higher')))
                     elif isinstance(value, list):
-                        query = query.filter(getattr(argument[1], key).contains(cast(value, ARRAY(String))))
+                        if any(isinstance(i, list) for i in value):
+                            for inner_value in value:
+                                query = query.filter(getattr(argument[1], key).overlap(cast(inner_value,
+                                                                                            ARRAY(String))))
+                        else:
+                            query = query.filter(getattr(argument[1], key).overlap(cast(value, ARRAY(String))))
                     else:
                         query = query.filter(getattr(argument[1], key) == value)
             result_list = []
             for item in query:
                 result_list.append(item.as_dict())
+                print(item.movie_title, item.imdb_db.genres)
             return json.dumps(result_list)
         except Exception:
             raise Exception
@@ -117,14 +160,14 @@ if __name__ == '__main__':
             "lower": 3,
             "higher": 5
         },
-        "rewatch": True,
-        "director": ["Wes Anderson"],
+        "genres": [["Drama"], ["Romance"]],
         "watchdate": {
-            "lower": "2020-05-01",
+            "lower": "2020-04-01",
             "higher": "2020-06-30"
-        }
+        },
+        "director": ["Wes Anderson", "Mani Ratnam"]
     }
+
     data = json.dumps(data)
     db = DatabaseListTools()
     print(db.query_db(data))
-    # db._checl_val("id", 1, "233")
