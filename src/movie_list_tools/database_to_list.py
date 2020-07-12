@@ -8,7 +8,7 @@ from src.movie_list_tools.dataclass_helpers import ListMovieObject, ListMovieMet
 
 class DatabaseToList(ListBaseClass):
 
-    def __init__(self, file_location: str, list_name: str, input_json):
+    def __init__(self, file_location: str, list_name: str, input_json: json, column: str = None):
         super().__init__(file_location, list_name)
         self.input_json = input_json
         self.output_json = None
@@ -16,6 +16,13 @@ class DatabaseToList(ListBaseClass):
         self.listmetadata = ListMovieMetadata(date=datetime.today(),
                                               name=self.list_name,
                                               url="")
+        self.column = column.split(".")
+        if len(self.column) > 1:
+            self.column = self.column[1] if self.column[0] == "imdb_info" else None
+            self.imdb_col = True
+        else:
+            self.column = self.column[0]
+            self.imdb_col = False
 
     def get_details(self):
         dba = DatabaseQueryTool()
@@ -31,22 +38,35 @@ class DatabaseToList(ListBaseClass):
 
     def json_list_objects(self):
 
-        for item in self.output_json:
+        for item in self.output_json.values():
             print(item)
-            if item.get("movie_title") not in self.list_item_dicts:
+            if item.get("movie_title") not in self.movie_names:
                 self.movie_names.append(item.get("movie_title"))
-                self.list_item_dicts[item.get("movie_title")] = ListMovieObject(position=len(self.movie_names),
-                                                                                name=item.get("movie_title"),
-                                                                                year=item.get("year_released"),
-                                                                                url=item.get("letterboxd_link"),
-                                                                                metadata=self.listmetadata)
-        self.sorted_dict = self.list_item_dicts
 
-    def _sorter(self, movie_list: list):
-        pass
+    def _sorter(self, imdb_col: bool = False, movie_list: list = None):
+        if imdb_col:
+            self.movie_names = sorted(self.movie_names,
+                                      key=lambda x: self.output_json.get(x).get("imdb_info").get(self.column))
+        else:
+            self.movie_names = sorted(self.movie_names, key=lambda x: self.output_json.get(x).get(self.column))
+        print(self.movie_names)
 
     def _movie_object_sorter(self):
-        pass
+        for index, name in enumerate(self.movie_names, 1):
+            item = self.output_json.get(name)
+            self.sorted_dict[name] = ListMovieObject(position=index,
+                                                     name=item.get("movie_title"),
+                                                     year=item.get("year_released"),
+                                                     url=item.get("letterboxd_link"),
+                                                     metadata=self.listmetadata)
+
+    def generate_list(self):
+        db.get_details()
+        db.json_list_objects()
+        db.gen_first_lines()
+        db._sorter(imdb_col=self.imdb_col)
+        db._movie_object_sorter()
+        db._write_list_csv()
 
 
 if __name__ == '__main__':
@@ -64,8 +84,5 @@ if __name__ == '__main__':
     }
 
     db = DatabaseToList(file_location="E:\\Movie Data\\letterboxd-naveenpiedy-jun", list_name="gen_test",
-                        input_json=json.dumps(data))
-    db.get_details()
-    db.json_list_objects()
-    db.gen_first_lines()
-    db._write_list_csv()
+                        input_json=json.dumps(data), column="imdb_info.director")
+    db.generate_list()

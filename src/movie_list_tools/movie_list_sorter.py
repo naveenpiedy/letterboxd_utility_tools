@@ -1,6 +1,6 @@
 import abc
 import csv
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 import os
 import logging
 
@@ -15,7 +15,7 @@ class ListBaseClass(metaclass=abc.ABCMeta):
         """
         self.list_location = file_location
         self.list_item_dicts = dict()
-        self.sorted_dict = dict()
+        self.sorted_dict = OrderedDict()
         self.movie_names = list()
         self.rewatch_dict = defaultdict(list)
         self.first_lines = []
