@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 
 class LetterBoxdRss:
 
-    def __init__(self, feed_url: str = "None", base=Base, engine=engine, session=Session):
+    def __init__(self, feed_url: str = "None"):
         """
         This class is meant to be a one stop tool box for anything
         concerning to do with letterboxd RSS Feed and your local DB.
@@ -25,8 +25,8 @@ class LetterBoxdRss:
         self.entries = feed.entries
         self.feed_len = len(self.entries)
         self.type_entry = dict()
-        base.metadata.create_all(engine)
-        self.session = session()
+        Base.metadata.create_all(engine)
+        self.session = Session()
         self.imdb_obj = imdb.IMDb()
         self.all_letterbox_sha = None
 
