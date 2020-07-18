@@ -9,3 +9,10 @@ install:
 script:
   - pytest
   - flake8
+services:
+  - postgresql
+env:
+  - db_conn = 'postgresql+psycopg2://admin:admin@localhost/travis_ci_test'
+before_script:
+  - psql -c 'create database travis_ci_test;' -U postgres
+  - psql -c "CREATE USER admin WITH PASSWORD 'admin';" -U postgres

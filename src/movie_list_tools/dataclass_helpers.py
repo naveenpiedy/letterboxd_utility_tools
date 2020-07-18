@@ -22,7 +22,7 @@ class ListMovieMetadata:
 class ListMovieObject:
     position: int
     name: str
-    year: date
+    year: int
     url: str
     metadata: ListMovieMetadata
     description: str = ''
