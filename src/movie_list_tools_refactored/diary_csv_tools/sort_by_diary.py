@@ -84,7 +84,7 @@ class CombineListDiaryItems:
 
             return combined_dicts
         except AttributeError:
-            raise Exception(f"Something off with the inputs. Please use the appropriate classes to generate the input")
+            raise Exception("Something off with the inputs. Please use the appropriate classes to generate the input")
 
 
 class SortListDiaryItems:
@@ -112,4 +112,4 @@ class SortListDiaryItems:
             return sorted_dict
 
         except AttributeError:
-            raise Exception(f"Something off with the inputs. Please use the appropriate classes to generate the input")
+            raise Exception("Something off with the inputs. Please use the appropriate classes to generate the input")
