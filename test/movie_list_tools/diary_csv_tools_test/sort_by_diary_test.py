@@ -95,8 +95,7 @@ class SortListDiaryItemsTest(unittest.TestCase):
         cldi = CombineListDiaryItems(diary_items, rewatch_dict, list_items)
         combined_dict = cldi.combine_dict()
 
-        sldi = SortListDiaryItems(combined_dict, "wrong_col", False)
-        self.assertRaises(Exception, sldi.sorter)
+        self.assertRaises(Exception, SortListDiaryItems, combined_dict, "wrong_col", False)
 
 
 if __name__ == '__main__':
