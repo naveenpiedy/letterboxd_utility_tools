@@ -33,9 +33,9 @@ class DatabaseToListTest(unittest.TestCase):
             "genres": [["Drama"], ["Romance"]],
             "watchdate": {
                 "lower": "2020-04-01",
-                "higher": "2020-06-30"
+                "higher": "2020-06-23"
             },
-            "director": ["Wes Anderson", "Mani Ratnam"]
+            "director": ["Wes Anderson", "Mani Ratnam", "Greta Gerwig"]
         }
 
         db = DatabaseToList(output_location=path, output_list_metadata=metadata,
@@ -44,8 +44,8 @@ class DatabaseToListTest(unittest.TestCase):
         parsed_json = db.parse_output_json()
         movie_names = list(parsed_json.keys())
 
-        english_movies = ['Moonrise Kingdom', 'Hotel Chevalier', 'The Life Aquatic with Steve Zissou']
-        tamil_movies = ['Alaipayuthey', 'Mouna Raagam']
+        english_movies = ['Moonrise Kingdom', 'Little Women', 'Hotel Chevalier']
+        tamil_movies = ['Alaipayuthey']
 
         self.assertEqual(movie_names[:3], english_movies)
         self.assertEqual(movie_names[3:], tamil_movies)
