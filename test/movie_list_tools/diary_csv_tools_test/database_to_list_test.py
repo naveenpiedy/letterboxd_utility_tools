@@ -47,8 +47,8 @@ class DatabaseToListTest(unittest.TestCase):
         english_movies = ['Moonrise Kingdom', 'Little Women', 'Hotel Chevalier']
         tamil_movies = ['Alaipayuthey']
 
-        self.assertEqual(movie_names[:3], english_movies)
-        self.assertEqual(movie_names[3:], tamil_movies)
+        self.assertEqual(set(movie_names[:3]), set(english_movies))
+        self.assertEqual(set(movie_names[3:]), set(tamil_movies))
 
 
 if __name__ == '__main__':
