@@ -3,8 +3,8 @@ import unittest
 from datetime import datetime
 
 from src.movie_list_tools.dataclass_helpers import ListMovieMetadata, ListMovieObject
-from src.movie_list_tools_refactored.diary_csv_tools.diary_list_helpers import sort_diary_items, read_part_diary
-from src.movie_list_tools_refactored.diary_csv_tools.generate_list_from_diary import GenerateListFromDiary
+from src.movie_list_tools.diary_csv_tools.diary_list_helpers import sort_diary_items, read_part_diary
+from src.movie_list_tools.diary_csv_tools.generate_list_from_diary import GenerateListFromDiary
 
 path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "test_csvs")
 diary_path = os.path.join(path, "diary.csv")

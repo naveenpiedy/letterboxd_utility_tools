@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 from src.movie_list_tools.dataclass_helpers import ListMovieObject, ListMovieMetadata
-from src.movie_list_tools_refactored.csv_reader_writer import MovieListCSVReader, MovieListCSVWriter
+from src.movie_list_tools.csv_reader_writer import MovieListCSVReader, MovieListCSVWriter
 
 path = os.path.join(os.path.dirname(__file__), "test_csvs")
 

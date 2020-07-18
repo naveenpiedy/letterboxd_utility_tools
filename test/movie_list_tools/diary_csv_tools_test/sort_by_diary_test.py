@@ -2,8 +2,8 @@ import os
 import unittest
 from datetime import datetime
 
-from src.movie_list_tools_refactored.csv_reader_writer import MovieListCSVReader
-from src.movie_list_tools_refactored.diary_csv_tools.sort_by_diary import ReadDiary, CombineListDiaryItems, \
+from src.movie_list_tools.csv_reader_writer import MovieListCSVReader
+from src.movie_list_tools.diary_csv_tools.sort_by_diary import ReadDiary, CombineListDiaryItems, \
     SortListDiaryItems
 
 path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "test_csvs")

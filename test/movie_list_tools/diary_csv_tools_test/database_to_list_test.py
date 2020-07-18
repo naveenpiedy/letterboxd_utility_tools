@@ -6,7 +6,7 @@ import pytest
 
 from src.database_pipeline_tools.letterboxd_rss_parser import LetterBoxdRss
 from src.movie_list_tools.dataclass_helpers import ListMovieMetadata
-from src.movie_list_tools_refactored.database_list_tools.database_to_list import DatabaseToList
+from src.movie_list_tools.database_list_tools.database_to_list import DatabaseToList
 from datetime import date
 
 path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "test_csvs")

@@ -2,12 +2,12 @@ import os
 import unittest
 from unittest import mock
 
-from src.movie_list_tools_refactored.mergesort_movielist import MovieListMergeSorter
-from src.movie_list_tools_refactored.csv_reader_writer import MovieListCSVReader
+from src.movie_list_tools.mergesort_movielist import MovieListMergeSorter
+from src.movie_list_tools.csv_reader_writer import MovieListCSVReader
 
 
 class MergeSortTest(unittest.TestCase):
-    path = "src.movie_list_tools_refactored.mergesort_movielist"
+    path = "src.movie_list_tools.mergesort_movielist"
 
     @mock.patch(f"{path}.input", create=True)
     def test_mergesort(self, mocked_input):

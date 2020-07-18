@@ -2,7 +2,7 @@ import os
 import unittest
 from datetime import datetime
 
-from src.movie_list_tools_refactored.diary_csv_tools.diary_list_helpers import check_values, read_part_diary, \
+from src.movie_list_tools.diary_csv_tools.diary_list_helpers import check_values, read_part_diary, \
     sort_diary_items
 
 path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "test_csvs")
