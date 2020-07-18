@@ -14,7 +14,7 @@ class ReadDiaryTest(unittest.TestCase):
     def test_read_diary(self):
         rd = ReadDiary(diary_location=diary_path)
         diary_items, rewatch_dict = rd.read_diary()
-        expected_movienames = ['Once Upon a Timeâ€¦ in Hollywood', 'Jojo Rabbit', "Molly's Game",
+        expected_movienames = ['Once Upon a Time.. in Hollywood', 'Jojo Rabbit', "Molly's Game",
                                'Kannum Kannum Kollaiyadithaal',
                                'Parasite', 'The Nice Guys', 'The Grand Budapest Hotel', 'Knives Out',
                                'Portrait of a Lady on Fire',
