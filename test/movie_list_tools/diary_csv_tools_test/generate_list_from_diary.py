@@ -25,7 +25,7 @@ class GenerateListFromDiaryTest(unittest.TestCase):
 
         glfd = GenerateListFromDiary(diary_items, lmd, movie_list)
 
-        sorted_movie_dict = glfd.generate_list_items()
+        sorted_movie_dict = glfd.generate_list_items
 
         expected_moonrise_obj = ListMovieObject(position=1, name='Moonrise Kingdom', year=2012,
                                                 url='https://letterboxd.com/test_user/film/moonrise-kingdom/',

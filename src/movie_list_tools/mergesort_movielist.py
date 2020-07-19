@@ -1,13 +1,15 @@
+from typing import List, Dict
+
 
 class MovieListMergeSorter:
     __slots__ = "list_items"
 
-    def __init__(self, list_items: dict):
+    def __init__(self, list_items: Dict):
         if not list_items:
             raise Exception("Please provide a non empty dict. Use CSV Reader to read the csv")
         self.list_items = list_items
 
-    def _merge_sort(self, movie_list: list):
+    def _merge_sort(self, movie_list: List):
         """
         Uses Merge Sort (based on user input) to sort list of movies. Sorts In-Place.
         Recommended to use self.movie_names
@@ -55,7 +57,7 @@ class MovieListMergeSorter:
                 right_half_index += 1
                 keeper += 1
 
-    def merge_sort_items(self) -> dict:
+    def merge_sort_items(self) -> Dict:
         movie_names = list(self.list_items.keys())
         self._merge_sort(movie_names)
         result_dict = dict()

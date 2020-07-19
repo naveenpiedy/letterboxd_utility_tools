@@ -1,6 +1,7 @@
 import csv
 from collections import defaultdict
 from datetime import datetime
+from typing import Dict, Callable
 
 from src.movie_list_tools.dataclass_helpers import DiaryMovieObject, CombinedListDiaryObject
 
@@ -18,10 +19,10 @@ def check_col(col: str) -> str:
 class ReadDiary:
     __slots__ = "diary_location"
 
-    def __init__(self, diary_location):
+    def __init__(self, diary_location: str):
         self.diary_location = diary_location
 
-    def read_diary(self, func=lambda x: True):
+    def read_diary(self, func: Callable = lambda x: True) -> (Dict, Dict):
         """
         Reads diary csv creates a neat dict with all items.
         """
@@ -56,12 +57,12 @@ class ReadDiary:
 class CombineListDiaryItems:
     __slots__ = ("diary_items", "rewatch_dict", "list_items")
 
-    def __init__(self, diary_items, rewatch_dict, list_items):
+    def __init__(self, diary_items: Dict, rewatch_dict: Dict, list_items: Dict):
         self.diary_items = diary_items
         self.rewatch_dict = rewatch_dict
         self.list_items = list_items
 
-    def combine_dict(self):
+    def combine_dict(self) -> Dict:
         """
         Combines details from list csv and diary csv -> self.combined_dict
         """
@@ -90,12 +91,15 @@ class CombineListDiaryItems:
 class SortListDiaryItems:
     __slots__ = ("combined_dict", "column", "reverse")
 
-    def __init__(self, combined_dict, column, reverse=False):
+    def __init__(self, combined_dict: Dict, column: str, reverse: bool = False):
         self.combined_dict = combined_dict
         self.column = check_col(column)
         self.reverse = reverse
 
-    def sorter(self):
+    def sorter(self) -> Dict:
+        """"
+        Sorts the combined dict and returns it.
+        """
         try:
             sorted_dict = dict()
             movie_names = self.combined_dict.keys()

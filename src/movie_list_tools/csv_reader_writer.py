@@ -2,6 +2,7 @@ import csv
 import logging
 import os
 from datetime import datetime
+from typing import Dict
 
 from src.movie_list_tools.dataclass_helpers import ListMovieMetadata, ListMovieObject
 
@@ -18,9 +19,10 @@ class MovieListCSVReader:
     def __init__(self, directory: str, list_name: str):
         self.directory, self.list_name = directory, list_name
 
-    def read_list_csv(self):
+    def read_list_csv(self) -> Dict:
         """
         Reads LetterBoxd List csv.
+        :rtype: Dictionary of ListMovieObject s
         """
         try:
             list_location = os.path.join(self.directory, LISTS_FOLDER, self.list_name)
@@ -58,7 +60,7 @@ class MovieListCSVWriter:
 
     def write_list_csv(self):
         """
-        Generates a LetterBoxd compliant list csv based on order in self.sorted_dict
+        Generates a LetterBoxd compliant list csv based on order in list_items
         """
         try:
             output_location = os.path.join(self.directory, OUTPUT_FOLDER)

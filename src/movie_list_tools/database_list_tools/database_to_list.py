@@ -1,13 +1,21 @@
 import json
 
 from src.database_pipeline_tools.database_query_tool import DatabaseQueryTool
-from src.movie_list_tools.dataclass_helpers import ListMovieObject
+from src.movie_list_tools.dataclass_helpers import ListMovieObject, ListMovieMetadata
+from typing import List
 
 
 class DatabaseToList:
     __slots__ = ("output_location", "output_list_metadata", "input_json", "column", "imdb_col")
 
-    def __init__(self, output_location, output_list_metadata, input_json, column):
+    def __init__(self, output_location: str, output_list_metadata: ListMovieMetadata, input_json: json, column: str):
+        """
+        Queries the database and generates ListObjects.
+        :param output_location: Path where the output list should go to
+        :param output_list_metadata: Use ListMetaData obj. Should contain metadata information of output list.
+        :param input_json: The query in json format.
+        :param column: Column based on which the output list should be sorted.
+        """
         self.output_location = output_location
         self.output_list_metadata = output_list_metadata
         self.input_json = input_json
@@ -24,6 +32,10 @@ class DatabaseToList:
             raise Exception("There is an issue with the column presented. Will not sort")
 
     def parse_output_json(self):
+        """
+        Parses the output json from DatabaseQueryTool
+        :return: A dict containing list objects (Sorted based on input column).
+        """
         dba = DatabaseQueryTool()
         output_json = json.loads(dba.query_db(self.input_json))
         movie_names = []
@@ -47,8 +59,11 @@ class DatabaseToList:
 
         return sorted_dict
 
-    def sort_output_json(self, output_json, movie_names):
-
+    def sort_output_json(self, output_json: json, movie_names: List) -> List:
+        """
+        This function is to be used by parse_output_json to sort the dict.
+        :rtype: Sorted list of movies
+        """
         if self.imdb_col:
             return sorted(movie_names, key=lambda x: output_json.get(x).get("imdb_info").get(self.column))
         else:
