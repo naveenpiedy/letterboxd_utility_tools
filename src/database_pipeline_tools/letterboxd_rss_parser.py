@@ -174,5 +174,5 @@ class LetterBoxdRss:
 if __name__ == '__main__':
     obj = LetterBoxdRss(feed_url="https://letterboxd.com/naveenpiedy/rss")
     obj.feed_db_pipeline()
-    # obj.correct_imdb_entry("b256ac175e487d230a02b6ed074becf81a85fa74", None, "1606183", delete_imdb_id=True)
+    # obj.correct_imdb_entry("270bf71f3bc1d3093eca8fbd6bf5531e4255a0db", None, "1382339", delete_imdb_id=True)
     # #obj.correct_imdb_entry("5e7b10b98624ff14df350ad77728665b8c52725c", "11462134", "2527338", delete_imdb_id=True)
