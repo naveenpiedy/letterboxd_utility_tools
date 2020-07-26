@@ -164,7 +164,7 @@ if __name__ == '__main__':
             "lower": "2020-04-01",
             "higher": "2020-06-30"
         },
-        "director": ["Wes Anderson", "Mani Ratnam"]
+        "director": ["Wes Anderson"]
     }
 
     data = json.dumps(data)
