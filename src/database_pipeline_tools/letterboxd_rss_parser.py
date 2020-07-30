@@ -142,7 +142,8 @@ class LetterBoxdRss:
                 movie_obj = MovieDatabase(**item)
                 self.session.add(movie_obj)
                 logging.info(f"{item.get('letterboxd_filmtitle')} watched on {item.get('letterboxd_watcheddate')} "
-                             f"added to be database. Relevant IMDB ID : {imdb_id}. Relevant SHA: {sha_generated}")
+                             f"added to be database. Relevant IMDB ID : {imdb_id}. Relevant SHA: {sha_generated}"
+                             f"IMDB Link: https://www.imdb.com/title/tt{imdb_id}/")
                 sha_so_far.add(sha_generated)
 
         self.session.commit()
