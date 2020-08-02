@@ -1,0 +1,20 @@
+custom_card_text {
+  font-family: "Roboto", sans-serif;
+  word-wrap: break-word;
+}
+
+.checked {
+  color: deepskyblue;
+}
+
+span.tab-space {padding-left:5em;}
+
+.card {
+ box-shadow: inset 0px 0px 181px -74px rgba(49,207,224,0.74);
+}
+
+.carousel {
+    border: 1px solid deepskyblue;
+    box-shadow: 0px 0px 19px 6px rgba(31,192,237,0.6);
+    border-radius: 7px;
+}
