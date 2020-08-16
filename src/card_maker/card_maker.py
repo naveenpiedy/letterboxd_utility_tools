@@ -44,7 +44,7 @@ class CardMaker:
                  'runtime': imdb_info.get('runtimes'),
                  'imdb_rating': imdb_info.get('rating'),
                  'trailer_link': trailer_link,
-                 'imdb_link': f"https://www.imdb.com/title/{self.imdb_id}/",
+                 'imdb_link': f"https://www.imdb.com/title/tt{self.imdb_id}/",
                  'rotten_tomatoes_link':
                      f"https://www.rottentomatoes.com/m/{self.rotten(query_results.get('movie_title'))}"}
 
@@ -94,4 +94,4 @@ class CardMaker:
 
 
 if __name__ == '__main__':
-    CardMaker(imdb_id='0265666').make_card_html()
+    CardMaker(imdb_id='0106364').make_card_html()
