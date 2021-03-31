@@ -15,7 +15,7 @@ idna==2.10
 IMDbPY==6.8
 importlib-metadata==1.7.0
 Jinja2==2.11.2
-lxml==4.5.1
+lxml==4.6.3
 MarkupSafe==1.1.1
 mccabe==0.6.1
 mirakuru==2.3.0
