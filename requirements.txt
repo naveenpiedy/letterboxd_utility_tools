@@ -21,7 +21,7 @@ mccabe==0.6.1
 mirakuru==2.3.0
 more-itertools==8.4.0
 nodeenv==1.4.0
-numpy==1.19.0
+numpy==1.22.0
 packaging==20.4
 pandas==1.0.5
 Pillow==7.2.0
