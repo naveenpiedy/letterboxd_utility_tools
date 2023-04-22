@@ -67,4 +67,4 @@ class DatabaseToList:
         if self.imdb_col:
             return sorted(movie_names, key=lambda x: output_json.get(x).get("imdb_info").get(self.column))
         else:
-            return sorted(movie_names, key=lambda x: output_json.get(x).get(self.column))
+            return sorted(movie_names, key=lambda x: output_json.get(x).get(self.column), reverse=True)

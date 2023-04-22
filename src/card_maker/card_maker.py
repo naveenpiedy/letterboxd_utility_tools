@@ -94,4 +94,4 @@ class CardMaker:
 
 
 if __name__ == '__main__':
-    CardMaker(imdb_id='0106364').make_card_html()
+    CardMaker(imdb_id='0088847').make_card_html()

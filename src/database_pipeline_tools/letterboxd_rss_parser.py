@@ -1,9 +1,12 @@
 import logging
+import sys
 
 import feedparser
 from src.database_pipeline_tools.base import Base, engine, Session
 from src.database_pipeline_tools.models import MovieDatabase, sha_gen, ExtensionIMDB
 import imdb
+
+sys.stdout.reconfigure(encoding='utf-8')
 
 logging.getLogger("imdb").setLevel(logging.WARNING)
 logging.basicConfig(level=logging.INFO)
@@ -17,17 +20,21 @@ class LetterBoxdRss:
         concerning to do with letterboxd RSS Feed and your local DB.
 
         Has methods to parse your RSS Feed, join relevant IMDB data
-        and write it to your local db.
+        and write it to your local db
 
         :param feed_url: Your RSS Feed url
         """
+        import ssl
+        if hasattr(ssl, '_create_unverified_context'):
+            ssl._create_default_https_context = ssl._create_unverified_context
         feed = feedparser.parse(feed_url)
         self.entries = feed.entries
         self.feed_len = len(self.entries)
+        print(feed)
         self.type_entry = dict()
         Base.metadata.create_all(engine)
         self.session = Session()
-        self.imdb_obj = imdb.IMDb()
+        self.imdb_obj = imdb.Cinemagoer()
         self.all_letterbox_sha = None
 
     def feed_db_pipeline(self):
@@ -44,6 +51,7 @@ class LetterBoxdRss:
         Segregates the items of the RSS Feed based on the type.
         """
         type_of = set()
+        # print(self.entries)
         for item in self.entries:
             id_value = item.get("id").split('-')
             type_item = id_value[1]
@@ -60,6 +68,7 @@ class LetterBoxdRss:
         Picks first from the result and is not always guaranteed to be correct.
         Until LetterBoxd has a reverse lookup, this is the best I have.
         """
+        # print(self.type_entry)
         for item in self.type_entry.get("watch"):
             title = item.get("letterboxd_filmtitle")
             year = item.get("letterboxd_filmyear")
@@ -67,7 +76,9 @@ class LetterBoxdRss:
             sha_generated = sha_gen(title, watch_date)
             try:
                 if title and sha_generated not in self.all_letterbox_sha:
+                    print(title)
                     movie = (self.imdb_obj.search_movie(f"{title} ({year})")[0])
+                    print(movie)
                     movie_id = movie.getID()
                     item["IMDB_ID"] = movie_id
                     logging.info(f"IMDB id used for {title} is {movie_id}")
@@ -133,6 +144,8 @@ class LetterBoxdRss:
             if sha_generated not in self.all_letterbox_sha and sha_generated not in sha_so_far:
                 imdb_id = item.get("IMDB_ID")
                 if imdb_id and imdb_id not in imdb_ids and imdb_id not in imdb_ids_so_far:
+                    if imdb_id == "9603082":
+                        continue
                     imdb_args = self.get_imdb_details(imdb_id)
                     imdb_db_obj = ExtensionIMDB(**imdb_args)
                     item["imdb_db_obj"] = imdb_db_obj
@@ -175,5 +188,5 @@ class LetterBoxdRss:
 if __name__ == '__main__':
     obj = LetterBoxdRss(feed_url="https://letterboxd.com/naveenpiedy/rss")
     obj.feed_db_pipeline()
-    # obj.correct_imdb_entry("270bf71f3bc1d3093eca8fbd6bf5531e4255a0db", None, "1382339", delete_imdb_id=True)
-    # #obj.correct_imdb_entry("5e7b10b98624ff14df350ad77728665b8c52725c", "11462134", "2527338", delete_imdb_id=True)
+    # obj.correct_imdb_entry("83989893f412a30c515a10dd05a5eab2ce0fd8b2", None, "8144782", delete_imdb_id=True)
+    # obj.correct_imdb_entry("5e7b10b98624ff14df350ad77728665b8c52725c", "11462134", "2527338", delete_imdb_id=True)

@@ -154,19 +154,52 @@ class DatabaseQueryTool:
 
 
 if __name__ == '__main__':
+    # data = {
+    #     "watchdate": {
+    #         "lower": "2021-02-28",
+    #         "higher": "2021-12-31"
+    #     },
+    # }
+
     data = {
-        "my_rating": {
-            "lower": 3,
-            "higher": 5
-        },
-        "genres": [["Drama"], ["Romance"]],
         "watchdate": {
-            "lower": "2020-04-01",
-            "higher": "2020-06-30"
+                    "lower": "2022-11-01",
+                    "higher": "2023-01-31"
         },
-        "director": ["Wes Anderson"]
+        # "languages": ["Tamil", "Telugu"],
+        # "my_rating": {
+        #     "lower": "3.5",
+        #     "higher": "5"
+        # },
+        # 'genres': [["Horror"]],
+        # "rewatch": False
+        # "year": 2022
     }
 
     data = json.dumps(data)
     db = DatabaseQueryTool()
-    print(db.query_db(data))
+    result = json.loads(db.query_db(data))
+    # for i, j in enumerate(result.keys(), start=1):
+    #     print(i, j, result[j].get("my_rating"))
+    # rating_list = []
+    # for i in result:
+    #     rating = None
+    #     try:
+    #         rating = result[i].get("imdb_info").get("rating") / 2
+    #     except:
+    #         pass
+    #     rating_list.append({
+    #         "my_rating": result[i].get("my_rating"),
+    #         "imdb_rating": rating,
+    #         "title": result[i].get("movie_title"),
+    #         "genres": result[i].get("imdb_info").get("genres"),
+    #         "year": result[i].get("year_released"),
+    #         "languages": result[i].get("imdb_info").get("languages"),
+    #         "watchdate": result[i].get("watchdate"),
+    #         "rewatch": result[i].get("rewatch"),
+    #     })
+
+    # print(rating_list)
+    # with open('bla.json', 'w') as outfile:
+    #     json.dump(rating_list, outfile)
+    print(result)
