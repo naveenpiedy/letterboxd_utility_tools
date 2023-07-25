@@ -1,7 +1,7 @@
 appdirs==1.4.4
 atomicwrites==1.4.0
 attrs==19.3.0
-certifi==2020.6.20
+certifi==2023.7.22
 cfgv==3.1.0
 chardet==3.0.4
 colorama==0.4.3
